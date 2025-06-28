@@ -1,0 +1,802 @@
+[
+  {
+    "team_id": 1,
+    "user_id": 1,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": true,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 2,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": true
+  },
+  {
+    "team_id": 1,
+    "user_id": 3,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 4,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 5,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 6,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 7,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 8,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 9,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 10,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 11,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 12,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 13,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 14,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 15,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 16,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 17,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 18,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 19,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 20,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 21,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 22,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 23,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 24,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 25,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 26,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 27,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 28,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 29,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 30,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 31,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 32,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 33,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 34,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 35,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 36,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 37,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 38,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 39,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 40,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 41,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 42,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 43,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 44,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 45,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 46,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 47,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 48,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 49,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 1,
+    "user_id": 50,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 51,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": true,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 52,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": true
+  },
+  {
+    "team_id": 2,
+    "user_id": 53,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 54,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 55,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 56,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 57,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 58,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 59,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 60,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 61,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 62,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 63,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 64,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 65,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 66,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 67,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 68,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 69,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 70,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 71,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 72,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 73,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 74,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 75,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 76,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 77,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 78,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 79,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 80,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 81,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 82,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 83,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 84,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 85,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 86,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 87,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 88,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 89,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 90,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 91,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 92,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 93,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 94,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 95,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 96,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 97,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 98,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 99,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  },
+  {
+    "team_id": 2,
+    "user_id": 100,
+    "join_date": "2024-02-01",
+    "leave_date": null,
+    "is_captain": false,
+    "is_vice_captain": false
+  }
+]

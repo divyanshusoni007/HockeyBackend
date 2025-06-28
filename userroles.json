@@ -1,0 +1,22 @@
+[
+  {
+    "role_id": 1,
+    "role_name": "Player"
+  },
+  {
+    "role_id": 2,
+    "role_name": "Coach"
+  },
+  {
+    "role_id": 3,
+    "role_name": "Manager"
+  },
+  {
+    "role_id": 4,
+    "role_name": "Referee"
+  },
+  {
+    "role_id": 5,
+    "role_name": "Scorer"
+  }
+]

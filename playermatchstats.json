@@ -1,0 +1,222 @@
+[
+  {
+    "match_id": 1,
+    "user_id": 94,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 67
+  },
+  {
+    "match_id": 1,
+    "user_id": 11,
+    "goals_scored": 1,
+    "assists": 0,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 42
+  },
+  {
+    "match_id": 1,
+    "user_id": 61,
+    "goals_scored": 1,
+    "assists": 0,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 49
+  },
+  {
+    "match_id": 1,
+    "user_id": 85,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 46
+  },
+  {
+    "match_id": 1,
+    "user_id": 79,
+    "goals_scored": 2,
+    "assists": 0,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 48
+  },
+  {
+    "match_id": 1,
+    "user_id": 9,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 59
+  },
+  {
+    "match_id": 1,
+    "user_id": 22,
+    "goals_scored": 2,
+    "assists": 0,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 59
+  },
+  {
+    "match_id": 1,
+    "user_id": 66,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 50
+  },
+  {
+    "match_id": 1,
+    "user_id": 50,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 58
+  },
+  {
+    "match_id": 1,
+    "user_id": 97,
+    "goals_scored": 0,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 35
+  },
+  {
+    "match_id": 1,
+    "user_id": 83,
+    "goals_scored": 1,
+    "assists": 0,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 36
+  },
+  {
+    "match_id": 1,
+    "user_id": 48,
+    "goals_scored": 0,
+    "assists": 0,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 64
+  },
+  {
+    "match_id": 1,
+    "user_id": 64,
+    "goals_scored": 0,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 46
+  },
+  {
+    "match_id": 1,
+    "user_id": 67,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 64
+  },
+  {
+    "match_id": 1,
+    "user_id": 60,
+    "goals_scored": 1,
+    "assists": 0,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 52
+  },
+  {
+    "match_id": 1,
+    "user_id": 23,
+    "goals_scored": 1,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 62
+  },
+  {
+    "match_id": 1,
+    "user_id": 42,
+    "goals_scored": 0,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 43
+  },
+  {
+    "match_id": 1,
+    "user_id": 92,
+    "goals_scored": 1,
+    "assists": 0,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 51
+  },
+  {
+    "match_id": 1,
+    "user_id": 68,
+    "goals_scored": 0,
+    "assists": 1,
+    "yellow_cards": 0,
+    "red_cards": 0,
+    "penalty_corners_won": 1,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 56
+  },
+  {
+    "match_id": 1,
+    "user_id": 89,
+    "goals_scored": 0,
+    "assists": 1,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "penalty_corners_won": 0,
+    "penalty_strokes_taken": 0,
+    "minutes_played": 53
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "match_id": 1,
+    "team_id": 1,
+    "goals": 3,
+    "FG": 2,
+    "PC": 1,
+    "PS": 0,
+    "shots_on_goal": 7,
+    "shots": 10,
+    "penalty_corners_awarded": 5,
+    "penalty_corners_scored": 1,
+    "penalty_strokes_awarded": 0,
+    "penalty_strokes_scored": 0,
+    "circle_penetrations": 20,
+    "yellow_cards": 1,
+    "red_cards": 0,
+    "goals_conceded": 2
+  },
+  {
+    "match_id": 1,
+    "team_id": 2,
+    "goals": 2,
+    "FG": 2,
+    "PC": 0,
+    "PS": 0,
+    "shots_on_goal": 5,
+    "shots": 9,
+    "penalty_corners_awarded": 4,
+    "penalty_corners_scored": 0,
+    "penalty_strokes_awarded": 0,
+    "penalty_strokes_scored": 0,
+    "circle_penetrations": 18,
+    "yellow_cards": 2,
+    "red_cards": 0,
+    "goals_conceded": 3
+  }
+]
