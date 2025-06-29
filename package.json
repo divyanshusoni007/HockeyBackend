@@ -18,6 +18,7 @@
   "homepage": "https://github.com/divyanshusoni007/HockeyBackend#readme",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "mongoose": "^8.16.1"
