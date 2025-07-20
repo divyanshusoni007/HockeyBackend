@@ -3,13 +3,10 @@
     "tournament_id": 1,
     "tournament_name": "Summer Cup 2025",
     "start_date": "2025-07-10",
-    "end_date": "2025-07-25",
-    "location": "Mumbai, Maharashtra, India",
+    "location": "Mumbai",
     "organizer_id": 103,
     "format": "Knockout",
     "tournament_category": "Senior Men's",
-    "match_type": "Field Hockey",
-    "referee_id": 105,
-    "scorer_id": 106
+    "match_type": "Field Hockey"
   }
 ]

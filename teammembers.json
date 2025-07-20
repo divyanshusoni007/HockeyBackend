@@ -2,801 +2,801 @@
   {
     "team_id": 1,
     "user_id": 1,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": true,
-    "is_vice_captain": false
+    "phone_number": "+919529615275",
+    "role": "player",
+    "name": "Arjun Patel",
+    "profile_pic": "https://example.com/photos/1.jpg"
   },
   {
     "team_id": 1,
     "user_id": 2,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": true
+    "phone_number": "+919504793184",
+    "role": "player",
+    "name": "Aditya Das",
+    "profile_pic": "https://example.com/photos/2.jpg"
   },
   {
     "team_id": 1,
     "user_id": 3,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919713645169",
+    "role": "player",
+    "name": "Krishna Pillai",
+    "profile_pic": "https://example.com/photos/3.jpg"
   },
   {
     "team_id": 1,
     "user_id": 4,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916495762348",
+    "role": "player",
+    "name": "Aarav Kapoor",
+    "profile_pic": "https://example.com/photos/4.jpg"
   },
   {
     "team_id": 1,
     "user_id": 5,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917409874348",
+    "role": "player",
+    "name": "Rohan Nair",
+    "profile_pic": "https://example.com/photos/5.jpg"
   },
   {
     "team_id": 1,
     "user_id": 6,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916632880459",
+    "role": "player",
+    "name": "Diya Rastogi",
+    "profile_pic": "https://example.com/photos/6.jpg"
   },
   {
     "team_id": 1,
     "user_id": 7,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918311639723",
+    "role": "player",
+    "name": "Zara Reddy",
+    "profile_pic": "https://example.com/photos/7.jpg"
   },
   {
     "team_id": 1,
     "user_id": 8,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917491228808",
+    "role": "player",
+    "name": "Kiara Pillai",
+    "profile_pic": "https://example.com/photos/8.jpg"
   },
   {
     "team_id": 1,
     "user_id": 9,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917187556862",
+    "role": "player",
+    "name": "Sara Bose",
+    "profile_pic": "https://example.com/photos/9.jpg"
   },
   {
     "team_id": 1,
     "user_id": 10,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919901597465",
+    "role": "player",
+    "name": "Siddharth Gupta",
+    "profile_pic": "https://example.com/photos/10.jpg"
   },
   {
     "team_id": 1,
     "user_id": 11,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919048494026",
+    "role": "player",
+    "name": "Ishaan Nair",
+    "profile_pic": "https://example.com/photos/11.jpg"
   },
   {
     "team_id": 1,
     "user_id": 12,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918676878743",
+    "role": "player",
+    "name": "Tara Mehta",
+    "profile_pic": "https://example.com/photos/12.jpg"
   },
   {
     "team_id": 1,
     "user_id": 13,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918607324296",
+    "role": "player",
+    "name": "Tara Kapoor",
+    "profile_pic": "https://example.com/photos/13.jpg"
   },
   {
     "team_id": 1,
     "user_id": 14,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917948385094",
+    "role": "player",
+    "name": "Zara Verma",
+    "profile_pic": "https://example.com/photos/14.jpg"
   },
   {
     "team_id": 1,
     "user_id": 15,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917967277638",
+    "role": "player",
+    "name": "Kiara Trivedi",
+    "profile_pic": "https://example.com/photos/15.jpg"
   },
   {
     "team_id": 1,
     "user_id": 16,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918615613239",
+    "role": "player",
+    "name": "Kiara Kurwade",
+    "profile_pic": "https://example.com/photos/16.jpg"
   },
   {
     "team_id": 1,
     "user_id": 17,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916378514962",
+    "role": "player",
+    "name": "Siddharth Bose",
+    "profile_pic": "https://example.com/photos/17.jpg"
   },
   {
     "team_id": 1,
     "user_id": 18,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917064051191",
+    "role": "player",
+    "name": "Vanya Kapoor",
+    "profile_pic": "https://example.com/photos/18.jpg"
   },
   {
     "team_id": 1,
     "user_id": 19,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919231495430",
+    "role": "player",
+    "name": "Zara Singh",
+    "profile_pic": "https://example.com/photos/19.jpg"
   },
   {
     "team_id": 1,
     "user_id": 20,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918714225802",
+    "role": "player",
+    "name": "Siddharth Pillai",
+    "profile_pic": "https://example.com/photos/20.jpg"
   },
   {
     "team_id": 1,
     "user_id": 21,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918587517187",
+    "role": "player",
+    "name": "Kiara Patel",
+    "profile_pic": "https://example.com/photos/21.jpg"
   },
   {
     "team_id": 1,
     "user_id": 22,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919408900003",
+    "role": "player",
+    "name": "Arjun Reddy",
+    "profile_pic": "https://example.com/photos/22.jpg"
   },
   {
     "team_id": 1,
     "user_id": 23,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918074232200",
+    "role": "player",
+    "name": "Kabir Khan",
+    "profile_pic": "https://example.com/photos/23.jpg"
   },
   {
     "team_id": 1,
     "user_id": 24,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919242550727",
+    "role": "player",
+    "name": "Meera Reddy",
+    "profile_pic": "https://example.com/photos/24.jpg"
   },
   {
     "team_id": 1,
     "user_id": 25,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918620258967",
+    "role": "player",
+    "name": "Ira Rastogi",
+    "profile_pic": "https://example.com/photos/25.jpg"
   },
   {
     "team_id": 1,
     "user_id": 26,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916800202342",
+    "role": "player",
+    "name": "Rohan Saxena",
+    "profile_pic": "https://example.com/photos/26.jpg"
   },
   {
     "team_id": 1,
     "user_id": 27,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918268486276",
+    "role": "player",
+    "name": "Vanya Yadav",
+    "profile_pic": "https://example.com/photos/27.jpg"
   },
   {
     "team_id": 1,
     "user_id": 28,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918641075042",
+    "role": "player",
+    "name": "Vivaan Saxena",
+    "profile_pic": "https://example.com/photos/28.jpg"
   },
   {
     "team_id": 1,
     "user_id": 29,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918058982440",
+    "role": "player",
+    "name": "Arjun Yadav",
+    "profile_pic": "https://example.com/photos/29.jpg"
   },
   {
     "team_id": 1,
     "user_id": 30,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918831604672",
+    "role": "player",
+    "name": "Kabir Das",
+    "profile_pic": "https://example.com/photos/30.jpg"
   },
   {
     "team_id": 1,
     "user_id": 31,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919245317068",
+    "role": "player",
+    "name": "Tara Mehta",
+    "profile_pic": "https://example.com/photos/31.jpg"
   },
   {
     "team_id": 1,
     "user_id": 32,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916459442845",
+    "role": "player",
+    "name": "Sara Joshi",
+    "profile_pic": "https://example.com/photos/32.jpg"
   },
   {
     "team_id": 1,
     "user_id": 33,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919419786374",
+    "role": "player",
+    "name": "Anaya Yadav",
+    "profile_pic": "https://example.com/photos/33.jpg"
   },
   {
     "team_id": 1,
     "user_id": 34,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917494324956",
+    "role": "player",
+    "name": "Rohan Gupta",
+    "profile_pic": "https://example.com/photos/34.jpg"
   },
   {
     "team_id": 1,
     "user_id": 35,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919481941646",
+    "role": "player",
+    "name": "Siddharth Yadav",
+    "profile_pic": "https://example.com/photos/35.jpg"
   },
   {
     "team_id": 1,
     "user_id": 36,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916533594595",
+    "role": "player",
+    "name": "Ishaan Yadav",
+    "profile_pic": "https://example.com/photos/36.jpg"
   },
   {
     "team_id": 1,
     "user_id": 37,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919641668841",
+    "role": "player",
+    "name": "Kiara Das",
+    "profile_pic": "https://example.com/photos/37.jpg"
   },
   {
     "team_id": 1,
     "user_id": 38,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916545162815",
+    "role": "player",
+    "name": "Kabir Kapoor",
+    "profile_pic": "https://example.com/photos/38.jpg"
   },
   {
     "team_id": 1,
     "user_id": 39,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917438888667",
+    "role": "player",
+    "name": "Aarav Bose",
+    "profile_pic": "https://example.com/photos/39.jpg"
   },
   {
     "team_id": 1,
     "user_id": 40,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916051354601",
+    "role": "player",
+    "name": "Siddharth Kurwade",
+    "profile_pic": "https://example.com/photos/40.jpg"
   },
   {
     "team_id": 1,
     "user_id": 41,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919281568562",
+    "role": "player",
+    "name": "Ira Joshi",
+    "profile_pic": "https://example.com/photos/41.jpg"
   },
   {
     "team_id": 1,
     "user_id": 42,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919955829012",
+    "role": "player",
+    "name": "Diya Singh",
+    "profile_pic": "https://example.com/photos/42.jpg"
   },
   {
     "team_id": 1,
     "user_id": 43,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919538611992",
+    "role": "player",
+    "name": "Riya Khan",
+    "profile_pic": "https://example.com/photos/43.jpg"
   },
   {
     "team_id": 1,
     "user_id": 44,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916483264745",
+    "role": "player",
+    "name": "Kabir Singh",
+    "profile_pic": "https://example.com/photos/44.jpg"
   },
   {
     "team_id": 1,
     "user_id": 45,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916762716154",
+    "role": "player",
+    "name": "Arjun Trivedi",
+    "profile_pic": "https://example.com/photos/45.jpg"
   },
   {
     "team_id": 1,
     "user_id": 46,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919164240280",
+    "role": "player",
+    "name": "Diya Singh",
+    "profile_pic": "https://example.com/photos/46.jpg"
   },
   {
     "team_id": 1,
     "user_id": 47,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918292578829",
+    "role": "player",
+    "name": "Anaya Gupta",
+    "profile_pic": "https://example.com/photos/47.jpg"
   },
   {
     "team_id": 1,
     "user_id": 48,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917537262560",
+    "role": "player",
+    "name": "Anaya Rastogi",
+    "profile_pic": "https://example.com/photos/48.jpg"
   },
   {
     "team_id": 1,
     "user_id": 49,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919812186906",
+    "role": "player",
+    "name": "Tara Pillai",
+    "profile_pic": "https://example.com/photos/49.jpg"
   },
   {
     "team_id": 1,
     "user_id": 50,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916009435833",
+    "role": "player",
+    "name": "Rohan Bose",
+    "profile_pic": "https://example.com/photos/50.jpg"
   },
   {
     "team_id": 2,
     "user_id": 51,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": true,
-    "is_vice_captain": false
+    "phone_number": "+918164205833",
+    "role": "player",
+    "name": "Tara Rastogi",
+    "profile_pic": "https://example.com/photos/51.jpg"
   },
   {
     "team_id": 2,
     "user_id": 52,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": true
+    "phone_number": "+916024245671",
+    "role": "player",
+    "name": "Tara Pillai",
+    "profile_pic": "https://example.com/photos/52.jpg"
   },
   {
     "team_id": 2,
     "user_id": 53,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918776959016",
+    "role": "player",
+    "name": "Vivaan Khan",
+    "profile_pic": "https://example.com/photos/53.jpg"
   },
   {
     "team_id": 2,
     "user_id": 54,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918768855958",
+    "role": "player",
+    "name": "Aarav Menon",
+    "profile_pic": "https://example.com/photos/54.jpg"
   },
   {
     "team_id": 2,
     "user_id": 55,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919252175315",
+    "role": "player",
+    "name": "Rohan Kurwade",
+    "profile_pic": "https://example.com/photos/55.jpg"
   },
   {
     "team_id": 2,
     "user_id": 56,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918218954863",
+    "role": "player",
+    "name": "Vanya Trivedi",
+    "profile_pic": "https://example.com/photos/56.jpg"
   },
   {
     "team_id": 2,
     "user_id": 57,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917755976246",
+    "role": "player",
+    "name": "Siddharth Reddy",
+    "profile_pic": "https://example.com/photos/57.jpg"
   },
   {
     "team_id": 2,
     "user_id": 58,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918876176605",
+    "role": "player",
+    "name": "Vanya Verma",
+    "profile_pic": "https://example.com/photos/58.jpg"
   },
   {
     "team_id": 2,
     "user_id": 59,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916669995863",
+    "role": "player",
+    "name": "Sara Patel",
+    "profile_pic": "https://example.com/photos/59.jpg"
   },
   {
     "team_id": 2,
     "user_id": 60,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917077925250",
+    "role": "player",
+    "name": "Riya Yadav",
+    "profile_pic": "https://example.com/photos/60.jpg"
   },
   {
     "team_id": 2,
     "user_id": 61,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918812484901",
+    "role": "player",
+    "name": "Vivaan Das",
+    "profile_pic": "https://example.com/photos/61.jpg"
   },
   {
     "team_id": 2,
     "user_id": 62,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918735433372",
+    "role": "player",
+    "name": "Siddharth Menon",
+    "profile_pic": "https://example.com/photos/62.jpg"
   },
   {
     "team_id": 2,
     "user_id": 63,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917595145112",
+    "role": "player",
+    "name": "Zara Pillai",
+    "profile_pic": "https://example.com/photos/63.jpg"
   },
   {
     "team_id": 2,
     "user_id": 64,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918825750278",
+    "role": "player",
+    "name": "Aditya Yadav",
+    "profile_pic": "https://example.com/photos/64.jpg"
   },
   {
     "team_id": 2,
     "user_id": 65,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919823914858",
+    "role": "player",
+    "name": "Vivaan Joshi",
+    "profile_pic": "https://example.com/photos/65.jpg"
   },
   {
     "team_id": 2,
     "user_id": 66,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918155313861",
+    "role": "player",
+    "name": "Kabir Bose",
+    "profile_pic": "https://example.com/photos/66.jpg"
   },
   {
     "team_id": 2,
     "user_id": 67,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916081940786",
+    "role": "player",
+    "name": "Riya Saxena",
+    "profile_pic": "https://example.com/photos/67.jpg"
   },
   {
     "team_id": 2,
     "user_id": 68,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919287518348",
+    "role": "player",
+    "name": "Ira Rastogi",
+    "profile_pic": "https://example.com/photos/68.jpg"
   },
   {
     "team_id": 2,
     "user_id": 69,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917887869509",
+    "role": "player",
+    "name": "Siddharth Menon",
+    "profile_pic": "https://example.com/photos/69.jpg"
   },
   {
     "team_id": 2,
     "user_id": 70,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917051035049",
+    "role": "player",
+    "name": "Meera Singh",
+    "profile_pic": "https://example.com/photos/70.jpg"
   },
   {
     "team_id": 2,
     "user_id": 71,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917778293161",
+    "role": "player",
+    "name": "Kabir Sharma",
+    "profile_pic": "https://example.com/photos/71.jpg"
   },
   {
     "team_id": 2,
     "user_id": 72,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916816952955",
+    "role": "player",
+    "name": "Kabir Patel",
+    "profile_pic": "https://example.com/photos/72.jpg"
   },
   {
     "team_id": 2,
     "user_id": 73,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916399071914",
+    "role": "player",
+    "name": "Siddharth Bose",
+    "profile_pic": "https://example.com/photos/73.jpg"
   },
   {
     "team_id": 2,
     "user_id": 74,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917945510312",
+    "role": "player",
+    "name": "Meera Pillai",
+    "profile_pic": "https://example.com/photos/74.jpg"
   },
   {
     "team_id": 2,
     "user_id": 75,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916143717638",
+    "role": "player",
+    "name": "Kabir Das",
+    "profile_pic": "https://example.com/photos/75.jpg"
   },
   {
     "team_id": 2,
     "user_id": 76,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919233085142",
+    "role": "player",
+    "name": "Arjun Trivedi",
+    "profile_pic": "https://example.com/photos/76.jpg"
   },
   {
     "team_id": 2,
     "user_id": 77,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919848297723",
+    "role": "player",
+    "name": "Meera Singh",
+    "profile_pic": "https://example.com/photos/77.jpg"
   },
   {
     "team_id": 2,
     "user_id": 78,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919612847416",
+    "role": "player",
+    "name": "Siddharth Menon",
+    "profile_pic": "https://example.com/photos/78.jpg"
   },
   {
     "team_id": 2,
     "user_id": 79,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919282333775",
+    "role": "player",
+    "name": "Kabir Singh",
+    "profile_pic": "https://example.com/photos/79.jpg"
   },
   {
     "team_id": 2,
     "user_id": 80,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916678800733",
+    "role": "player",
+    "name": "Aditya Kurwade",
+    "profile_pic": "https://example.com/photos/80.jpg"
   },
   {
     "team_id": 2,
     "user_id": 81,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917943220876",
+    "role": "player",
+    "name": "Aditya Gupta",
+    "profile_pic": "https://example.com/photos/81.jpg"
   },
   {
     "team_id": 2,
     "user_id": 82,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919048676388",
+    "role": "player",
+    "name": "Aarav Mehta",
+    "profile_pic": "https://example.com/photos/82.jpg"
   },
   {
     "team_id": 2,
     "user_id": 83,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918318709355",
+    "role": "player",
+    "name": "Aditya Das",
+    "profile_pic": "https://example.com/photos/83.jpg"
   },
   {
     "team_id": 2,
     "user_id": 84,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919588494717",
+    "role": "player",
+    "name": "Aarav Kapoor",
+    "profile_pic": "https://example.com/photos/84.jpg"
   },
   {
     "team_id": 2,
     "user_id": 85,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918335226700",
+    "role": "player",
+    "name": "Riya Rastogi",
+    "profile_pic": "https://example.com/photos/85.jpg"
   },
   {
     "team_id": 2,
     "user_id": 86,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919632947579",
+    "role": "player",
+    "name": "Rohan Joshi",
+    "profile_pic": "https://example.com/photos/86.jpg"
   },
   {
     "team_id": 2,
     "user_id": 87,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916860125163",
+    "role": "player",
+    "name": "Ishaan Rastogi",
+    "profile_pic": "https://example.com/photos/87.jpg"
   },
   {
     "team_id": 2,
     "user_id": 88,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918538519431",
+    "role": "player",
+    "name": "Riya Verma",
+    "profile_pic": "https://example.com/photos/88.jpg"
   },
   {
     "team_id": 2,
     "user_id": 89,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917859336382",
+    "role": "player",
+    "name": "Siddharth Bose",
+    "profile_pic": "https://example.com/photos/89.jpg"
   },
   {
     "team_id": 2,
     "user_id": 90,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917013789043",
+    "role": "player",
+    "name": "Rohan Yadav",
+    "profile_pic": "https://example.com/photos/90.jpg"
   },
   {
     "team_id": 2,
     "user_id": 91,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919721351171",
+    "role": "player",
+    "name": "Arjun Rastogi",
+    "profile_pic": "https://example.com/photos/91.jpg"
   },
   {
     "team_id": 2,
     "user_id": 92,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916818380955",
+    "role": "player",
+    "name": "Anaya Mehta",
+    "profile_pic": "https://example.com/photos/92.jpg"
   },
   {
     "team_id": 2,
     "user_id": 93,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917355246506",
+    "role": "player",
+    "name": "Ira Khan",
+    "profile_pic": "https://example.com/photos/93.jpg"
   },
   {
     "team_id": 2,
     "user_id": 94,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+917713084216",
+    "role": "player",
+    "name": "Tara Menon",
+    "profile_pic": "https://example.com/photos/94.jpg"
   },
   {
     "team_id": 2,
     "user_id": 95,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+918522040814",
+    "role": "player",
+    "name": "Aditya Patel",
+    "profile_pic": "https://example.com/photos/95.jpg"
   },
   {
     "team_id": 2,
     "user_id": 96,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+916996027749",
+    "role": "player",
+    "name": "Zara Verma",
+    "profile_pic": "https://example.com/photos/96.jpg"
   },
   {
     "team_id": 2,
     "user_id": 97,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919979854542",
+    "role": "player",
+    "name": "Vanya Bose",
+    "profile_pic": "https://example.com/photos/97.jpg"
   },
   {
     "team_id": 2,
     "user_id": 98,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919905116793",
+    "role": "player",
+    "name": "Arjun Yadav",
+    "profile_pic": "https://example.com/photos/98.jpg"
   },
   {
     "team_id": 2,
     "user_id": 99,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919558112515",
+    "role": "player",
+    "name": "Sara Yadav",
+    "profile_pic": "https://example.com/photos/99.jpg"
   },
   {
     "team_id": 2,
     "user_id": 100,
-    "join_date": "2024-02-01",
-    "leave_date": null,
-    "is_captain": false,
-    "is_vice_captain": false
+    "phone_number": "+919435164742",
+    "role": "player",
+    "name": "Kiara Khan",
+    "profile_pic": "https://example.com/photos/100.jpg"
   }
 ]
