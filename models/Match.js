@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const MatchSchema = new mongoose.Schema({
  match_id:{ type: String, unique: true }, // Ensure match_id is unique
- tournament_id: { type: Number},
+ tournament_id: { type: String},
  rounds:{type:String},
- home_team_id:{ type: Number },
- away_team_id: { type: Number },
+ home_team_id:{ type: String },
+ away_team_id: { type: String },
  match_type:{type:String},
  city: { type: String },
  venue:{type:String},
@@ -15,7 +15,7 @@ const MatchSchema = new mongoose.Schema({
  scorer_name: {type:String},
  home_score:{type:Number, default: 0}, // Default to 0
  away_score: {type:Number, default: 0}, // Default to 0
- winner_team_id: {type:Number},
+ winner_team_id: {type:String},
 });
 
 module.exports = mongoose.model('Match', MatchSchema);

@@ -2,6 +2,7 @@ const User = require("./models/User");
 const Match = require("./models/Match");
 const AddTournament = require("./models/AddTournament");
 const Teams = require("./models/Teams");
+const TeamMembers = require("./models/TeamMembers");
 
 require("dotenv").config();
 
@@ -390,7 +391,9 @@ app.post("/api/teams/:team_id/members", async (req, res) => {
     }
 
     // 2. Validate if the team_id exists
-    const team = await Teams.findOne({ team_name: team_id }); // Assuming team_id in URL is actually team_name like "Abbb"
+    // The issue is here: You were querying by team_name using team_id from the URL.
+    // Instead, query by the actual team_id.
+    const team = await Teams.findOne({ team_id: team_id }); 
     if (!team) {
       return res.status(404).json({ error: `Team "${team_id}" not found.` });
     }
@@ -444,21 +447,72 @@ app.post("/api/teams/:team_id/members", async (req, res) => {
   }
 });
 
+// app.post("/api/teams/:team_id/members", async (req, res) => {
+//   try {
+//     const { team_id } = req.params; // Get team_id from the URL (e.g., 'T001')
+//     const { phone_number, role } = req.body; // Get phone_number and optional role from the request body
+
+//     // 1. Validate incoming data
+//     if (!phone_number || phone_number.trim() === "") {
+//       return res.status(400).json({ error: "Phone number is required." });
+//     }
+
+//     // 2. Validate if the provided team_id exists in the Teams collection
+//     const team = await Teams.findOne({ team_id: team_id });
+//     if (!team) {
+//       return res.status(404).json({ error: `Team "${team_id}" not found.` });
+//     }
+
+//     // 3. Search for the user in the User collection using the provided phone number
+//     const user = await User.findOne({ phone_number: phone_number });
+
+//     if (!user) {
+//       // If no user is found with the given phone number, return an error
+//       return res.status(404).json({ error: "User not found with this phone number. Please ensure the user exists." });
+//     }
+
+//     // 4. Check if the user is already a member of this specific team to prevent duplicates
+//     const existingMember = await TeamMembers.findOne({
+//       team_id: team.team_id, // Use the actual team_id found from the Teams collection
+//       user_id: user.user_id, // Use the user_id from the found user
+//     });
+
+//     if (existingMember) {
+//       return res
+//         .status(409)
+//         .json({ error: "This user is already a member of this team." });
+//     }
+
+//     // 5. Create a new TeamMember entry
+//     const newTeamMember = new TeamMembers({
+//       team_id: team.team_id,             // The ID of the team
+//       user_id: user.user_id,             // The ID of the user found
+//       phone_number: user.phone_number,   // The phone number of the user (from the User document)
+//       role: role || 'Player',            // Use the provided role, or default to 'Player'
+//       name: user.full_name,              // The full name of the user (from the User document)
+//       profile_pic: user.profile_pic,     // The profile picture URL of the user (from the User document)
+//     });
+
+//     await newTeamMember.save(); // Save the new team member to the database
+
+//     res.status(201).json({
+//       message: "Team member added successfully",
+//       member: newTeamMember,
+//     });
+//   } catch (error) {
+//     console.error("Error adding team member:", error);
+//     // Handle specific duplicate key error if phone_number+team_id or user_id+team_id combination is unique
+//     if (error.code === 11000) {
+//       return res.status(409).json({
+//         error: "A member with this phone number is already associated with this team.",
+//       });
+//     }
+//     res.status(500).json({ error: "Server error: Could not add team member." });
+//   }
+// });
 
 
-app.get("/api/events/:match_id", async (req, res) => {
-  try {
-    const { match_id } = req.params; // Extract match_id from URL parameters
-    const match = await Match.findOne({ match_id: match_id });
-    if (!match) {
-      return res.status(404).json({ message: "Match not found" });
-    }
-    res.status(200).json(match); // Send the found match as JSON
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+
 
 app.get("/api/tournaments/:tournament_id", async (req, res) => {
   try {
