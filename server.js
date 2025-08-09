@@ -242,6 +242,7 @@ app.post("/api/match", async (req, res) => {
 // POST METHOD FOR ADD TOURNAMENTS
 app.post("/api/addtournaments", async (req, res) => {
   try {
+    console.log("Received request to add tournament:", req.body);
     const {
       tournament_name,
       start_date,
@@ -282,6 +283,7 @@ app.post("/api/addtournaments", async (req, res) => {
       tournament_category,
       match_type,
     });
+    console.log("New tournament object:", newTournament);
 
     await newTournament.save();
 
@@ -534,6 +536,23 @@ app.get("/api/users/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params; // Extract match_id from URL parameters
     const user = await User.findOne({ user_id: user_id });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user); // Send the found match as JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/api/users/:phone_number", async (req, res) => {
+  try {
+    console.log("Received request to get user by phone number:", req.params);
+    const { phone_number } = req.params; // Extract phone_number from URL parameters
+    const user = await User.findOne({ phone_number: phone_number });
+     const users = await User.find(); 
+     console.log("All users:", users); // Log all users for debugging
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
