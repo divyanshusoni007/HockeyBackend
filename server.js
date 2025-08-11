@@ -3,28 +3,37 @@ const Match = require("./models/Match");
 const AddTournament = require("./models/AddTournament");
 const Teams = require("./models/Teams");
 const TeamMembers = require("./models/TeamMembers");
+const MatchEvent = require("./models/MatchEvent");
 
 require("dotenv").config();
 
 const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
 const mongoose = require("mongoose");
 
 const app = express();
 app.use(express.json());
 
 const cors = require("cors");
-// const Tournament = require('./models/AddTournament');
 app.use(cors());
 
+const server = http.createServer(app);
+
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+
 // Replace with your local or Atlas URI
-// const mongoURI = process.env.MONGODB_URI;
-// const mongoURI = "mongodb+srv://mahfijulfadil:9MKKoqio5DqNTMAj@clusterhockey.j8jqh1h.mongodb.net/?retryWrites=true&w=majority&appName=ClusterHockey"
-// const mongoURI = "mongodb+srv://<db_username>:<db_password>@clusterhockey.j8jqh1h.mongodb.net/?retryWrites=true&w=majority&appName=ClusterHockey"
 console.log("👉 Attempting to connect to MongoDB...");
 console.log(`MONGODB_URI: ${process.env.MONGODB_URI}`);
 
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
@@ -447,73 +456,6 @@ app.post("/api/teams/:team_id/members", async (req, res) => {
   }
 });
 
-// app.post("/api/teams/:team_id/members", async (req, res) => {
-//   try {
-//     const { team_id } = req.params; // Get team_id from the URL (e.g., 'T001')
-//     const { phone_number, role } = req.body; // Get phone_number and optional role from the request body
-
-//     // 1. Validate incoming data
-//     if (!phone_number || phone_number.trim() === "") {
-//       return res.status(400).json({ error: "Phone number is required." });
-//     }
-
-//     // 2. Validate if the provided team_id exists in the Teams collection
-//     const team = await Teams.findOne({ team_id: team_id });
-//     if (!team) {
-//       return res.status(404).json({ error: `Team "${team_id}" not found.` });
-//     }
-
-//     // 3. Search for the user in the User collection using the provided phone number
-//     const user = await User.findOne({ phone_number: phone_number });
-
-//     if (!user) {
-//       // If no user is found with the given phone number, return an error
-//       return res.status(404).json({ error: "User not found with this phone number. Please ensure the user exists." });
-//     }
-
-//     // 4. Check if the user is already a member of this specific team to prevent duplicates
-//     const existingMember = await TeamMembers.findOne({
-//       team_id: team.team_id, // Use the actual team_id found from the Teams collection
-//       user_id: user.user_id, // Use the user_id from the found user
-//     });
-
-//     if (existingMember) {
-//       return res
-//         .status(409)
-//         .json({ error: "This user is already a member of this team." });
-//     }
-
-//     // 5. Create a new TeamMember entry
-//     const newTeamMember = new TeamMembers({
-//       team_id: team.team_id,             // The ID of the team
-//       user_id: user.user_id,             // The ID of the user found
-//       phone_number: user.phone_number,   // The phone number of the user (from the User document)
-//       role: role || 'Player',            // Use the provided role, or default to 'Player'
-//       name: user.full_name,              // The full name of the user (from the User document)
-//       profile_pic: user.profile_pic,     // The profile picture URL of the user (from the User document)
-//     });
-
-//     await newTeamMember.save(); // Save the new team member to the database
-
-//     res.status(201).json({
-//       message: "Team member added successfully",
-//       member: newTeamMember,
-//     });
-//   } catch (error) {
-//     console.error("Error adding team member:", error);
-//     // Handle specific duplicate key error if phone_number+team_id or user_id+team_id combination is unique
-//     if (error.code === 11000) {
-//       return res.status(409).json({
-//         error: "A member with this phone number is already associated with this team.",
-//       });
-//     }
-//     res.status(500).json({ error: "Server error: Could not add team member." });
-//   }
-// });
-
-
-
-
 app.get("/api/tournaments/:tournament_id", async (req, res) => {
   try {
     const { tournament_id } = req.params; // Extract match_id from URL parameters
@@ -544,8 +486,97 @@ app.get("/api/users/:user_id", async (req, res) => {
   }
 });
 
+
+// GET all matches for the dashboard
+app.get("/api/matches", async (req, res) => {
+  try {
+    const matches = await Match.find({});
+    res.status(200).json(matches);
+  } catch (error) {
+    console.error("Error fetching matches:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// GET a specific match by ID (for the scorer page)
+// This route now also fetches the team names
+app.get("/api/matches/:matchId", async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const match = await Match.findOne({ match_id: matchId });
+    if (!match) {
+      return res.status(404).json({ message: "Match not found" });
+    }
+
+    // Fetch full team details to get the team names
+    const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
+    const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
+    
+    // Combine everything into a single response object
+    const responseData = {
+      ...match.toObject(),
+      home_team_name: homeTeam?.team_name,
+      away_team_name: awayTeam?.team_name,
+    };
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error("Error fetching match:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+// NEW: API endpoint to update the score
+app.post("/api/matches/:matchId/score", async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { teamName } = req.body;
+
+    const match = await Match.findOne({ match_id: matchId });
+    if (!match) {
+      return res.status(404).json({ message: "Match not found" });
+    }
+
+    // Find the team by name to determine which score to update
+    const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
+    const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
+
+    if (homeTeam && homeTeam.team_name === teamName) {
+        match.home_score = (match.home_score || 0) + 1;
+    } else if (awayTeam && awayTeam.team_name === teamName) {
+        match.away_score = (match.away_score || 0) + 1;
+    } else {
+        return res.status(400).json({ message: "Invalid team name provided." });
+    }
+    
+    const updatedMatch = await match.save();
+    
+    // Broadcast the update to all clients
+    io.emit("scoreUpdate", {
+      matchId,
+      homeScore: updatedMatch.home_score,
+      awayScore: updatedMatch.away_score,
+    });
+
+    res.status(200).json({ message: "Score updated successfully", match: updatedMatch });
+  } catch (error) {
+    console.error("Error updating score:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
+
 const PORT = 3000;
 console.log(`✅ MONGODB_URI=${process.env.MONGODB_URI}`);
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
