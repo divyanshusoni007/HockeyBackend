@@ -577,7 +577,7 @@ io.on("connection", (socket) => {
 });
 
 
-app.get("/api/users/:phone_number", async (req, res) => {
+app.get("/api/users/phone/:phone_number", async (req, res) => {
   try {
     console.log("Received request to get user by phone number:", req.params);
     const { phone_number } = req.params; // Extract phone_number from URL parameters
