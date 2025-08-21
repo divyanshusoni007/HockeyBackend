@@ -473,6 +473,15 @@ app.get("/api/tournaments/:tournament_id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+app.get("/api/tournaments", async (req, res) => {
+  try {
+    const tournaments = await AddTournament.find({});
+    res.status(200).json(tournaments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 app.get("/api/users/:user_id", async (req, res) => {
   try {
