@@ -483,10 +483,25 @@ app.get("/api/tournaments", async (req, res) => {
   }
 });
 
-app.get("/api/teams", async (req, res) => {
+app.get("/api/:tournament_id/teams", async (req, res) => {
   try {
-    const teams = await Teams.find({});
-    res.status(200).json(teams);
+     const { tournament_id } = req.params;
+    if (!tournament_id) {
+      return res
+        .status(400)
+        .json({ error: "Tournament ID is missing from the URL." });
+    } // Verify if the provided tournament_id actually exists
+
+    const tournamentExists = await AddTournament.findOne({
+      tournament_id: tournament_id,
+    });
+    if (!tournamentExists) {
+      return res
+        .status(404)
+        .json({ error: `Tournament with ID "${tournament_id}" not found.` });
+    }
+  const teams = await Teams.find({ tournament_id: tournament_id });
+  res.status(200).json(teams);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
