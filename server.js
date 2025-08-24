@@ -483,6 +483,16 @@ app.get("/api/tournaments", async (req, res) => {
   }
 });
 
+app.get("/api/teams", async (req, res) => {
+  try {
+    const teams = await Teams.find({});
+    res.status(200).json(teams);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.get("/api/users/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params; // Extract match_id from URL parameters
