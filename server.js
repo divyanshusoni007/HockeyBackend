@@ -506,6 +506,33 @@ app.get("/api/:tournament_id/teams", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
+})
+
+app.get("/api/team/:team_id/members", async (req, res) => {
+  try {
+     const { team_id } = req.params;
+    if (!team_id) {
+      return res
+        .status(400)
+        .json({ error: "Team ID is missing from the URL." });
+    } // Verify if the provided team_id actually exists
+
+    const teamExists = await Teams.findOne({
+      team_id: team_id,
+    });
+
+    console.log("Team exists:", teamExists); // Debug log to check if team is found
+    if (!teamExists) {
+      return res
+        .status(404)
+        .json({ error: `Team with ID "${team_id}" not found.` });
+    }
+  const members = await TeamMembers.find({ team_id: team_id });
+  res.status(200).json(members);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 app.get("/api/users/:user_id", async (req, res) => {
