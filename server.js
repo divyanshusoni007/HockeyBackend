@@ -1,48 +1,90 @@
-const User = require("./models/User");
-const Match = require("./models/Match");
-const AddTournament = require("./models/AddTournament");
-const Teams = require("./models/Teams");
-const TeamMembers = require("./models/TeamMembers");
-const MatchEvent = require("./models/MatchEvent");
-
 require("dotenv").config();
 
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
 const mongoose = require("mongoose");
+const cors = require("cors");
+
+const Match = require("./models/Match");
+const MatchLive = require('./models/MatchLive');
 
 const app = express();
-app.use(express.json());
-
-const cors = require("cors");
-app.use(cors());
-
 const server = http.createServer(app);
+const { Server } = require("socket.io");
 
-const io = socketIo(server, {
+// Create socket.io instance
+const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "*", // Change to your frontend URL in production
     methods: ["GET", "POST"]
   }
 });
 
+app.use(cors());
+app.use(express.json());
 
-// Replace with your local or Atlas URI
-console.log("👉 Attempting to connect to MongoDB...");
-console.log(`MONGODB_URI: ${process.env.MONGODB_URI}`);
 
 mongoose
-  .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Connected to MongoDB"))
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("✅ Connected to MongoDB Atlas");
+  })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
     process.exit(1);
   });
 
+
+// Root route
 app.get("/", (req, res) => {
   res.send("Hockey App Backend Running");
 });
+
+// GET all matches for the dashboard
+app.get('/api/matches', async (req, res) => {
+  try {
+    const matches = await MatchLive.find();
+    res.json(matches);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/matchlive/:matchId", async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    console.log("📌 MatchId received in API:", matchId);
+
+    // Try finding in MatchLive
+    let matchLive = await MatchLive.findOne({
+      match_id: mongoose.Types.ObjectId.isValid(matchId)
+        ? new mongoose.Types.ObjectId(matchId)
+        : matchId
+    });
+
+    if (matchLive) {
+      console.log("✅ Found in MatchLive");
+      return res.json(matchLive);
+    }
+
+    console.log("⚠️ Not found in MatchLive, checking Match collection...");
+
+    // If not found, try Match collection
+    const match = await Match.findById(matchId);
+    if (match) {
+      console.log("✅ Found in Match collection");
+      return res.json(match);
+    }
+
+    console.log("❌ Match not found in either collection");
+    return res.status(404).json({ error: "Match not found" });
+
+  } catch (err) {
+    console.error("🔥 Error fetching match live data:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 // POST METHOD FOR ADD USER
 app.post("/api/users", async (req, res) => {
@@ -312,7 +354,6 @@ app.post("/api/addtournaments", async (req, res) => {
   }
 });
 
-
 // POST METHOD FOR ADD TEAMS
 app.post("/api/tournament/:tournament_id/team", async (req, res) => {
   try {
@@ -387,10 +428,7 @@ app.post("/api/tournament/:tournament_id/team", async (req, res) => {
   }
 });
 
-
-
 //  POST METHOD FOR ADDING TEAM MEMBERS
-
 app.post("/api/teams/:team_id/members", async (req, res) => {
   try {
     const { team_id } = req.params; // Get team_id from the URL
@@ -488,15 +526,45 @@ app.get("/api/users/:user_id", async (req, res) => {
   }
 });
 
-
-// GET all matches for the dashboard
-app.get("/api/matches", async (req, res) => {
+// Update timer state
+app.post('/api/matches/:matchId/timer', async (req, res) => {
   try {
-    const matches = await Match.find({});
-    res.status(200).json(matches);
-  } catch (error) {
-    console.error("Error fetching matches:", error);
-    res.status(500).json({ error: "Server error" });
+    const { matchId } = req.params;
+    const { totalSeconds, isPaused } = req.body;
+
+    console.log("Incoming timer update:", { matchId, totalSeconds, isPaused });
+
+    const match = await MatchLive.findOneAndUpdate(
+      { match_id: matchId },
+      { total_seconds: totalSeconds, is_paused: isPaused },
+      //{ new: true }
+    );
+
+    if (!match) {
+      console.log("Match not found for code:", matchId);
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    // ✅ Emit snake_case globally
+    io.emit("timerUpdated", {
+      match_id: match.match_id,
+      total_seconds: match.total_seconds,
+      is_paused: match.is_paused,
+      status: match.status
+    });
+
+    // 🔧 FIXED: Emit to specific room 
+    io.to(matchId).emit("timerUpdated", {
+      match_id: match.match_id,
+      total_seconds: match.total_seconds,
+      is_paused: match.is_paused,
+      status: match.status
+    });
+
+    res.json(match);
+  } catch (err) {
+    console.error("Error updating timer:", err);
+    res.status(500).json({ error: 'Failed to update timer' });
   }
 });
 
@@ -528,55 +596,6 @@ app.get("/api/matches/:matchId", async (req, res) => {
   }
 });
 
-
-// NEW: API endpoint to update the score
-app.post("/api/matches/:matchId/score", async (req, res) => {
-  try {
-    const { matchId } = req.params;
-    const { teamName } = req.body;
-
-    const match = await Match.findOne({ match_id: matchId });
-    if (!match) {
-      return res.status(404).json({ message: "Match not found" });
-    }
-
-    // Find the team by name to determine which score to update
-    const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
-    const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
-
-    if (homeTeam && homeTeam.team_name === teamName) {
-        match.home_score = (match.home_score || 0) + 1;
-    } else if (awayTeam && awayTeam.team_name === teamName) {
-        match.away_score = (match.away_score || 0) + 1;
-    } else {
-        return res.status(400).json({ message: "Invalid team name provided." });
-    }
-    
-    const updatedMatch = await match.save();
-    
-    // Broadcast the update to all clients
-    io.emit("scoreUpdate", {
-      matchId,
-      homeScore: updatedMatch.home_score,
-      awayScore: updatedMatch.away_score,
-    });
-
-    res.status(200).json({ message: "Score updated successfully", match: updatedMatch });
-  } catch (error) {
-    console.error("Error updating score:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-
-io.on("connection", (socket) => {
-  console.log("A user connected");
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
-
-
 app.get("/api/users/:phone_number", async (req, res) => {
   try {
     console.log("Received request to get user by phone number:", req.params);
@@ -593,6 +612,282 @@ app.get("/api/users/:phone_number", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+// NEW: API endpoint to update the score
+app.post("/api/matches/:matchId/score", async (req, res) => {
+  const matchId = req.params.matchId;
+  const { teamName } = req.body;
+  
+  try {
+    const match = await Match.findById(matchId);
+    if (!match) return res.status(404).json({ message: "Match not found" });
+
+    if (teamName === match.home_team_name) {
+      match.home_score += 1;
+    } else if (teamName === match.away_team_name) {
+      match.away_score += 1;
+    }
+    await match.save();
+
+    // ✅ Emit to dashboards
+    // io.emit("scoreUpdate", {
+    //   matchId,
+    //   homeScore: match.home_score,
+    //   awayScore: match.away_score
+    // });
+
+    res.json(match);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a new event to a match
+app.post('/api/matches/:matchId/events', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const event = req.body;
+
+    console.log("📌 New event for match:", matchId, event);
+
+    const match = await MatchLive.findOneAndUpdate(
+      { match_id: matchId },
+      { $push: { match_events: event } },
+      //{ new: true }   // return updated doc
+    );
+
+    if (!match) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    // ✅ Emit snake_case globally
+    io.emit("eventAdded", {
+      match_id: match.match_id,
+      match_events: [event],
+      status: match.status
+    });
+
+    // 🔧 FIXED: Emit to specific room
+    io.to(matchId).emit("eventAdded", {
+      match_id: match.match_id,
+      event: event,
+      match_events: match.match_events,
+      status: match.status
+    });
+
+    res.json(match);
+  } catch (err) {
+    console.error("🔥 Error saving event:", err);
+    res.status(500).json({ error: "Failed to save event" });
+  }
+});
+
+// Update score when a goal is added
+app.post('/api/matches/:matchId/score', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { teamName } = req.body;
+
+    const match = await MatchLive.findOne({ match_id: matchId });
+    if (!match) return res.status(404).json({ error: "Match not found" });
+
+    if (teamName === match.team1_name) match.team1_score++;
+    else if (teamName === match.team2_name) match.team2_score++;
+
+    await match.save();
+
+    // ✅ Emit in snake_case, global emit
+    io.emit("scoreUpdated", {
+      match_id: match.match_id,
+      team1_score: match.team1_score,
+      team2_score: match.team2_score,
+      status: match.status
+    });
+
+    // 🔧 FIXED: Emit to specific room
+    io.to(matchId).emit("scoreUpdated", {
+      match_id: match.match_id,
+      team1_score: match.team1_score,
+      team2_score: match.team2_score,
+      status: match.status
+    });
+
+    console.log("📡 Emitted scoreUpdated:", match.match_id, match.team1_score, match.team2_score);
+
+    res.json(match);
+  } catch (err) {
+    console.error("🔥 Error updating score:", err);
+    res.status(500).json({ error: "Failed to update score" });
+  }
+});
+
+// 🔧 NEW: Update quarter
+app.post('/api/matches/:matchId/quarter', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { currentQuarter } = req.body;
+
+    const match = await MatchLive.findOneAndUpdate(
+      { match_id: matchId },
+      { current_quarter: currentQuarter },
+      { new: true }
+    );
+
+    if (!match) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    io.to(matchId).emit("quarterChanged", {
+      match_id: match.match_id,
+      current_quarter: match.current_quarter,
+      status: match.status
+    });
+
+    res.json(match);
+  } catch (err) {
+    console.error("Error updating quarter:", err);
+    res.status(500).json({ error: 'Failed to update quarter' });
+  }
+});
+
+
+// 🔧 NEW: Update match status
+app.post('/api/matches/:matchId/status', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { status } = req.body;
+
+    const match = await MatchLive.findOneAndUpdate(
+      { match_id: matchId },
+      { status: status },
+      { new: true }
+    );
+
+    if (!match) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+
+    io.to(matchId).emit("matchStatusChanged", {
+      match_id: match.match_id,
+      status: match.status
+    });
+
+    res.json(match);
+  } catch (err) {
+    console.error("Error updating match status:", err);
+    res.status(500).json({ error: 'Failed to update match status' });
+  }
+});
+
+
+// Socket.io connection handling
+io.on("connection", (socket) => {
+  console.log("🔌 New client connected");
+
+  // Join a room per match (so clients only get their match updates)
+  socket.on("joinMatch", (matchId) => {
+    socket.join(matchId);
+    console.log(`✅ Client joined room for match ${matchId}`);
+  });
+
+  // 🔧 NEW: Leave match room
+  socket.on("leaveMatch", (matchId) => {
+    socket.leave(matchId);
+    console.log(`❌ Client ${socket.id} left room for match ${matchId}`);
+  });
+
+  // Timer update
+  socket.on("timerUpdate", ({ matchId, totalSeconds, isPaused, displayMinutes, displaySeconds }) => {
+    console.log("Timer update:", { matchId, totalSeconds, isPaused });
+
+    io.emit("timerUpdated", {
+      match_id: matchId,
+      total_seconds: totalSeconds,
+      is_paused: isPaused,
+      status: "Live"
+    });
+
+    // Broadcast to all clients in this match room
+    io.to(matchId).emit("timerUpdated", {
+      match_id: matchId,
+      total_seconds: totalSeconds,
+      is_paused: isPaused,
+      display_minutes: displayMinutes,
+      display_seconds: displaySeconds,
+      status: "Live"
+    });
+  });
+
+  // Event add
+  socket.on("eventAdded", ({ matchId, event }) => {
+    console.log("Event added:", { matchId, event });
+
+    io.emit("eventAdded", {
+      match_id: matchId,
+      match_events: [event],
+      status: "Live"
+    });
+
+    io.to(matchId).emit("eventAdded", {
+      match_id: matchId,
+      event: event,
+      status: "Live"
+    });
+  });
+
+  // Score update
+  socket.on("scoreUpdated", ({ matchId, team1_score, team2_score }) => {
+    console.log("Score update:", { matchId, team1_score, team2_score });
+
+    // emit globally instead of io.to(matchId)
+    io.emit("scoreUpdated", {
+      match_id: matchId,
+      team1_score: team === "team1" ? score : undefined,
+      team2_score: team === "team2" ? score : undefined,
+      status: "Live"
+    });
+
+    io.to(matchId).emit("scoreUpdated", {
+      match_id: matchId,
+      team1_score: team1_score,
+      team2_score: team2_score,
+      status: "Live"
+    });
+  });
+
+  // 🔧 NEW: Handle quarter changes
+  socket.on("quarterChanged", ({ matchId, currentQuarter }) => {
+    console.log("Quarter changed from client:", { matchId, currentQuarter });
+
+    io.to(matchId).emit("quarterChanged", {
+      match_id: matchId,
+      current_quarter: currentQuarter,
+      status: "Live"
+    });
+  });
+
+  // 🔧 NEW: Handle match status changes
+  socket.on("matchStatusChanged", ({ matchId, status }) => {
+    console.log("Match status changed from client:", { matchId, status });
+
+    io.to(matchId).emit("matchStatusChanged", {
+      match_id: matchId,
+      status: status
+    });
+  });
+
+  // 🔧 NEW: Handle complete match state updates
+  socket.on("matchStateUpdate", (matchState) => {
+    console.log("Complete match state update:", matchState.matchId);
+
+    io.to(matchState.matchId).emit("matchStateUpdated", matchState);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected");
+  });
+});
+
 
 const PORT = 3000;
 console.log(`✅ MONGODB_URI=${process.env.MONGODB_URI}`);
