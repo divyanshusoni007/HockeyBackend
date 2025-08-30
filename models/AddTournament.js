@@ -6,7 +6,7 @@ const AddTournamentSchema = new mongoose.Schema({
   start_date: { type: Date, required: true },
   end_date: { type: Date, required: true },
   location: { type: String, required: true },
-  organizer_id: { type: Number, required: true },
+  organizer_id: { type: String, required: true },
   format: { type: String },
   tournament_category: { type: String },
   match_type: { type: String },

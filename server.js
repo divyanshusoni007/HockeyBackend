@@ -489,6 +489,67 @@ app.get("/api/tournaments/:tournament_id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+app.get("/api/tournaments", async (req, res) => {
+  try {
+    const tournaments = await AddTournament.find({});
+    res.status(200).json(tournaments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/api/:tournament_id/teams", async (req, res) => {
+  try {
+     const { tournament_id } = req.params;
+    if (!tournament_id) {
+      return res
+        .status(400)
+        .json({ error: "Tournament ID is missing from the URL." });
+    } // Verify if the provided tournament_id actually exists
+
+    const tournamentExists = await AddTournament.findOne({
+      tournament_id: tournament_id,
+    });
+    if (!tournamentExists) {
+      return res
+        .status(404)
+        .json({ error: `Tournament with ID "${tournament_id}" not found.` });
+    }
+  const teams = await Teams.find({ tournament_id: tournament_id });
+  res.status(200).json(teams);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+})
+
+app.get("/api/team/:team_id/members", async (req, res) => {
+  try {
+     const { team_id } = req.params;
+    if (!team_id) {
+      return res
+        .status(400)
+        .json({ error: "Team ID is missing from the URL." });
+    } // Verify if the provided team_id actually exists
+
+    const teamExists = await Teams.findOne({
+      team_id: team_id,
+    });
+
+    console.log("Team exists:", teamExists); // Debug log to check if team is found
+    if (!teamExists) {
+      return res
+        .status(404)
+        .json({ error: `Team with ID "${team_id}" not found.` });
+    }
+  const members = await TeamMembers.find({ team_id: team_id });
+  res.status(200).json(members);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 app.get("/api/users/:user_id", async (req, res) => {
   try {
@@ -593,7 +654,7 @@ io.on("connection", (socket) => {
 });
 
 
-app.get("/api/users/:phone_number", async (req, res) => {
+app.get("/api/users/phone/:phone_number", async (req, res) => {
   try {
     console.log("Received request to get user by phone number:", req.params);
     const { phone_number } = req.params; // Extract phone_number from URL parameters
