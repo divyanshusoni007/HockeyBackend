@@ -72,6 +72,17 @@ app.post("/api/users", async (req, res) => {
       return res.status(400).json({ error: "Email is required." });
     }
     // Add more validation as needed (e.g., email format, password strength)
+    if(!phone_number){
+      return res.status(400).json({error: "phone number is required."});
+    }
+
+    //  Explicitly check if phone number already exists
+    const existingPhone = await User.findOne({ phone_number });
+    if (existingPhone) {
+      return res.status(409).json({
+        error: "This phone number is already registered.",
+      });
+    }
 
     // --- Generate user_id ---
     const prefix = full_name.substring(0, 2).toLowerCase(); // Get first two letters, lowercase
@@ -117,7 +128,7 @@ app.post("/api/users", async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "User created successfully", user: newUser });
+      .json({ message: "User profile created successfully", user: newUser });
   } catch (error) {
     console.error("Error creating user:", error);
     // Handle specific MongoDB duplicate key error (code 11000)
@@ -126,10 +137,15 @@ app.post("/api/users", async (req, res) => {
       if (error.keyPattern && error.keyPattern.email) {
         errorMessage =
           "This email is already registered. Please use a different email.";
-      } else if (error.keyPattern && error.keyPattern.user_id) {
+      } 
+      if(error.keyPattern && error.keyPattern.phone_number){
         errorMessage =
-          "Generated user ID already exists. Please try again (rare conflict).";
+          "This phone number is already registered. Please try with different phone number";
       }
+      else if (error.keyPattern && error.keyPattern.user_id) {
+        errorMessage =
+          "Generated user ID already exists. Please try again.";
+      } 
       return res.status(409).json({ error: errorMessage });
     }
     res.status(500).json({ error: "Server error: Could not create user." });
@@ -593,6 +609,57 @@ app.get("/api/users/:phone_number", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+// API To Send email for contact us page --> MAke sure 2FA is enabled
+const nodemailer = require("nodemailer");
+app.post("/api/send-email", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Configure transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, // your gmail
+        pass: process.env.EMAIL_PASS, // your gmail app password
+      },
+    });
+
+    // Email options
+    const mailOptions = {
+      from: `"StickStats Contact" <${process.env.EMAIL_USER}>`,
+      to: "stickstatsindia@gmail.com", // your email where you want to receive
+      subject: `📩 New Contact Form Submission from ${name}`,
+      text: `
+        Name: ${name}
+        Email: ${email}
+        Message: ${message}
+      `,
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Message:</b> ${message}</p>
+      `,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "Email sent successfully!" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ error: "Failed to send email." });
+  }
+});
+
+
+
 
 const PORT = 3000;
 console.log(`✅ MONGODB_URI=${process.env.MONGODB_URI}`);

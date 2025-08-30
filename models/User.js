@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true }, // Assuming email should also be unique
     date_of_birth: { type: Date },
     gender: { type: String },
-    phone_number: { type: String },
+    phone_number: { type: String , unique:true, required: true},
     address: { type: String },
     zip: { type: String },
     position: { type: String },
