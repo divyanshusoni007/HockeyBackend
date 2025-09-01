@@ -1018,6 +1018,10 @@ io.on("connection", (socket) => {
 
 // API To Send email for contact us page --> MAke sure 2FA is enabled
 const nodemailer = require("nodemailer");
+const AddTournament = require("./models/AddTournament");
+const Teams = require("./models/Teams");
+const TeamMembers = require("./models/TeamMembers");
+const User = require("./models/User");
 app.post("/api/send-email", async (req, res) => {
   try {
     const { name, email, message } = req.body;
