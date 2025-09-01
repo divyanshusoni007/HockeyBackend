@@ -264,6 +264,28 @@ app.post("/api/match", async (req, res) => {
   }
 });
 
+// GET user by phone number to autofill organizer name
+app.get("/api/users/phone/:phone_number", async (req, res) => {
+  try {
+    const { phone_number } = req.params;
+    const user = await User.findOne({ phone_number });
+
+    if (!user) {
+      return res.status(404).json({ error: "No user found with this phone number." });
+    }
+
+    res.status(200).json({
+      user_id: user.user_id,
+      full_name: user.full_name,
+      phone_number: user.phone_number
+    });
+  } catch (error) {
+    console.error("Error fetching user by phone:", error);
+    res.status(500).json({ error: "Server error while fetching user." });
+  }
+});
+
+
 // POST METHOD FOR ADD TOURNAMENTS
 app.post("/api/addtournaments", async (req, res) => {
   try {
