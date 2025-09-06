@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const TeamSchema = new mongoose.Schema({
   team_id: { type: String, unique: true, required: true }, // e.g. "T001"
-  name: { type: String, required: true, unique: true },
+  team_name: { type: String, required: true, unique: true },
   short_name: { type: String }, // e.g. "IND"
   logo_url: { type: String },
 
@@ -23,10 +23,7 @@ const TeamSchema = new mongoose.Schema({
   },
 
   // Tournament participation
-  tournaments: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tournament'
-  }],
+tournament_id: { type: mongoose.Schema.Types.ObjectId, ref: "AddTournament"},
 
   // Matches played
   matches: [{

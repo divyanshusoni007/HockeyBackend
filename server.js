@@ -397,24 +397,28 @@ app.post("/api/tournament/:tournament_id/team", async (req, res) => {
   try {
     // Extract tournament_id from URL parameters
     const { tournament_id } = req.params;
-    const { name, city, logo_url } = req.body; // --- Validate tournament_id from URL ---
-    console.log("Received request to add team:", req.body);
+    const { team_name, city, logo_url } = req.body; // --- Validate tournament_id from URL ---
+   // console.log("Received request to add team:", req.body);
+
     if (!tournament_id) {
       return res
         .status(400)
         .json({ error: "Tournament ID is missing from the URL." });
     } // Verify if the provided tournament_id actually exists
 
-    const tournamentExists = await AddTournament.findOne({
+    const tournaments = await AddTournament.findOne({
       tournament_id: tournament_id,
+      
     });
-    if (!tournamentExists) {
+     
+   // console.log("Tournament exists:", tournaments);
+    if (!tournaments) {
       return res
         .status(404)
         .json({ error: `Tournament with ID "${tournament_id}" not found.` });
     } // Basic validation for team_name and city
 
-    if (!name || name.trim() === "") {
+    if (!team_name || team_name.trim() === "") {
       return res.status(400).json({ error: "Team name is required." });
     }
     if (!city || city.trim() === "") {
@@ -436,24 +440,25 @@ app.post("/api/tournament/:tournament_id/team", async (req, res) => {
       }
     }
     const team_id = `${prefix}${String(nextNumber).padStart(3, "0")}`; // Format with leading zeros (e.g., 'T001', 'T010')
-
+    // console.log("Generate tour:", tournaments);
+     //console.log("Generate teamer_id:", tournament_id);
     const newTeam = new Teams({
       team_id, // Auto-generated
-      tournament_id, // Fetched from URL
-      name,
+     tournament_id: tournaments._id, // Fetched from URL
+      team_name,
       city,
       logo_url,
     });
-    console.log("New team object:", newTeam);
+   // console.log("New team object:", newTeam);
     await newTeam.save();
-
+    
     res.status(201).json({ message: "Team added successfully", team: newTeam });
   } catch (error) {
     console.error("Error adding team:", error);
     if (error.code === 11000) {
       // Duplicate key error for team_id or team_name
       let errorMessage = "A team with this data already exists.";
-      if (error.keyPattern && error.keyPattern.name) {
+      if (error.keyPattern && error.keyPattern.team_name) {
         errorMessage =
           "A team with this name already exists. Please choose a different name.";
       } else if (error.keyPattern && error.keyPattern.team_id) {
@@ -571,13 +576,15 @@ app.get("/api/:tournament_id/teams", async (req, res) => {
     const tournamentExists = await AddTournament.findOne({
       tournament_id: tournament_id,
     });
-    console.log("Tournament exists:", tournamentExists);
+    //console.log("Tournament exists:", tournamentExists);
     if (!tournamentExists) {
       return res
         .status(404)
         .json({ error: `Tournament with ID "${tournament_id}" not found.` });
     }
-const teams = await Teams.find({ tournaments: tournamentExists._id });
+    //console.log("Tournament exists:", tournamentExists._id);
+const teams = await Teams.find({ tournament_id: tournamentExists._id });
+//console.log("Teams found:", teams);
   res.status(200).json(teams);
   } catch (error) {
     console.error(error);
