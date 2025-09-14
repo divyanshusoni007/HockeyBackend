@@ -705,43 +705,43 @@ app.get("/api/matches/:matchId", async (req, res) => {
 
 
 // NEW: API endpoint to update the score
-app.post("/api/matches/:matchId/score", async (req, res) => {
-  try {
-    const { matchId } = req.params;
-    const { teamName } = req.body;
+// app.post("/api/matches/:matchId/score", async (req, res) => {
+//   try {
+//     const { matchId } = req.params;
+//     const { teamName } = req.body;
 
-    const match = await Match.findOne({ match_id: matchId });
-    if (!match) {
-      return res.status(404).json({ message: "Match not found" });
-    }
+//     const match = await Match.findOne({ match_id: matchId });
+//     if (!match) {
+//       return res.status(404).json({ message: "Match not found" });
+//     }
 
-    // Find the team by name to determine which score to update
-    const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
-    const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
+//     // Find the team by name to determine which score to update
+//     const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
+//     const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
 
-    if (homeTeam && homeTeam.team_name === teamName) {
-        match.home_score = (match.home_score || 0) + 1;
-    } else if (awayTeam && awayTeam.team_name === teamName) {
-        match.away_score = (match.away_score || 0) + 1;
-    } else {
-        return res.status(400).json({ message: "Invalid team name provided." });
-    }
+//     if (homeTeam && homeTeam.team_name === teamName) {
+//         match.home_score = (match.home_score || 0) + 1;
+//     } else if (awayTeam && awayTeam.team_name === teamName) {
+//         match.away_score = (match.away_score || 0) + 1;
+//     } else {
+//         return res.status(400).json({ message: "Invalid team name provided." });
+//     }
     
-    const updatedMatch = await match.save();
+//     const updatedMatch = await match.save();
     
-    // Broadcast the update to all clients
-    io.emit("scoreUpdate", {
-      matchId,
-      homeScore: updatedMatch.home_score,
-      awayScore: updatedMatch.away_score,
-    });
+//     // Broadcast the update to all clients
+//     io.emit("scoreUpdate", {
+//       matchId,
+//       homeScore: updatedMatch.home_score,
+//       awayScore: updatedMatch.away_score,
+//     });
 
-    res.status(200).json({ message: "Score updated successfully", match: updatedMatch });
-  } catch (error) {
-    console.error("Error updating score:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+//     res.status(200).json({ message: "Score updated successfully", match: updatedMatch });
+//   } catch (error) {
+//     console.error("Error updating score:", error);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 
 
 io.on("connection", (socket) => {
@@ -770,33 +770,33 @@ app.get("/api/users/phone/:phone_number", async (req, res) => {
 });
 
 // NEW: API endpoint to update the score
-app.post("/api/matches/:matchId/score", async (req, res) => {
-  const matchId = req.params.matchId;
-  const { teamName } = req.body;
+// app.post("/api/matches/:matchId/score", async (req, res) => {
+//   const matchId = req.params.matchId;
+//   const { teamName } = req.body;
   
-  try {
-    const match = await Match.findById(matchId);
-    if (!match) return res.status(404).json({ message: "Match not found" });
+//   try {
+//     const match = await Match.findById(matchId);
+//     if (!match) return res.status(404).json({ message: "Match not found" });
 
-    if (teamName === match.home_team_name) {
-      match.home_score += 1;
-    } else if (teamName === match.away_team_name) {
-      match.away_score += 1;
-    }
-    await match.save();
-
-    // ✅ Emit to dashboards
-    // io.emit("scoreUpdate", {
-    //   matchId,
-    //   homeScore: match.home_score,
-    //   awayScore: match.away_score
-    // });
-
-    res.json(match);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     if (teamName === match.home_team_name) {
+//       match.home_score += 1;
+//     } else if (teamName === match.away_team_name) {
+//       match.away_score += 1;
+//     }
+//     await match.save();
+// 
+//    // ✅ Emit to dashboards
+//    // io.emit("scoreUpdate", {
+//    //   matchId,
+//    //   homeScore: match.home_score,
+//    //   awayScore: match.away_score
+//    // });
+// 
+//     res.json(match);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 // Add a new event to a match
 app.post('/api/matches/:matchId/events', async (req, res) => {
@@ -844,7 +844,7 @@ app.post('/api/matches/:matchId/score', async (req, res) => {
     const { matchId } = req.params;
     const { teamName } = req.body;
 
-    const match = await MatchLive.findOne({ match_id: matchId });
+    const match = await MatchLive.findOne({ match_id: matchId.trim() });
     if (!match) return res.status(404).json({ error: "Match not found" });
 
     if (teamName === match.team1_name) match.team1_score++;
@@ -998,8 +998,8 @@ io.on("connection", (socket) => {
     // emit globally instead of io.to(matchId)
     io.emit("scoreUpdated", {
       match_id: matchId,
-      team1_score: team === "team1" ? score : undefined,
-      team2_score: team === "team2" ? score : undefined,
+      team1_score: team1_score,
+      team2_score: team2_score,
       status: "Live"
     });
 
