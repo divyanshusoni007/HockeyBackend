@@ -25,6 +25,10 @@ const TeamSchema = new mongoose.Schema({
   // Tournament participation
 tournament_id: { type: mongoose.Schema.Types.ObjectId, ref: "AddTournament"},
 
+  pool: {
+    name: { type: String },
+    type: { type: String }
+  },
   // Matches played
   matches: [{
     type: mongoose.Schema.Types.ObjectId,
