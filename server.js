@@ -564,6 +564,80 @@ app.get("/api/tournaments", async (req, res) => {
   }
 });
 
+app.post("/api/:tournament_id/pool", async (req, res) => {
+  try {
+    const { tournament_id } = req.params;
+    const { pool_name, pool_type, team_ids } = req.body;
+
+    // Validate request body
+    if (!pool_name || !pool_type || !team_ids || team_ids.length === 0) {
+      return res.status(400).json({ 
+        error: "Pool name, pool type and team IDs are required." 
+      });
+    }
+
+    // Find the tournament
+    const tournament = await AddTournament.findOne({ tournament_id });
+    if (!tournament) {
+      return res.status(404).json({ error: "Tournament not found." });
+    }
+
+    // Check if the pool name already exists in this tournament
+    const existingPool = await Teams.findOne({
+      tournaments: tournament._id,
+      'pool.name': pool_name
+    });
+
+    if (existingPool) {
+      return res.status(400).json({ 
+        error: "Pool name must be unique within the tournament." 
+      });
+    }
+
+    // Validate that all teams exist and belong to the tournament
+    const teamsExist = await Teams.find({ 
+      team_id: { $in: team_ids },
+      tournaments: tournament._id 
+    });
+
+    if (teamsExist.length !== team_ids.length) {
+      return res.status(400).json({ 
+        error: "One or more team IDs are invalid or don't belong to this tournament." 
+      });
+    }
+
+    // Update teams with pool information as an object
+    await Teams.updateMany(
+      { 
+        team_id: { $in: team_ids },
+        tournaments: tournament._id
+      },
+      {
+        $set: {
+          pool: {
+            name: pool_name,
+            type: pool_type
+          }
+        }
+      }
+    );
+
+    res.status(200).json({ 
+      message: "Teams updated with pool information successfully.",
+      updated_teams: team_ids,
+      pool: {
+        name: pool_name,
+        type: pool_type
+      }
+    });
+
+  } catch (error) {
+    console.error("Error updating pool information:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 app.get("/api/:tournament_id/teams", async (req, res) => {
   try {
      const { tournament_id } = req.params;
