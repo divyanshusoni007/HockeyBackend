@@ -567,12 +567,13 @@ app.get("/api/tournaments", async (req, res) => {
 app.post("/api/:tournament_id/pool", async (req, res) => {
   try {
     const { tournament_id } = req.params;
-    const { pool_name, pool_type, team_ids } = req.body;
+    const { pool_name, pool_type, teams } = req.body;
+    console.log("Received pool creation request:", req.body);
 
     // Validate request body
-    if (!pool_name || !pool_type || !team_ids || team_ids.length === 0) {
-      return res.status(400).json({ 
-        error: "Pool name, pool type and team IDs are required." 
+    if (!pool_name || !pool_type || !teams || teams.length === 0) {
+      return res.status(400).json({
+        error: "Pool name, pool type and teams are required."
       });
     }
 
@@ -589,26 +590,29 @@ app.post("/api/:tournament_id/pool", async (req, res) => {
     });
 
     if (existingPool) {
-      return res.status(400).json({ 
-        error: "Pool name must be unique within the tournament." 
+      return res.status(400).json({
+        error: "Pool name must be unique within the tournament."
       });
     }
 
+    // Extract team IDs from the request
+    const team_ids = teams.map((team) => team.team_id);
+
     // Validate that all teams exist and belong to the tournament
-    const teamsExist = await Teams.find({ 
+    const teamsExist = await Teams.find({
       team_id: { $in: team_ids },
-      tournaments: tournament._id 
+      tournament_id: tournament_id
     });
 
     if (teamsExist.length !== team_ids.length) {
-      return res.status(400).json({ 
-        error: "One or more team IDs are invalid or don't belong to this tournament." 
+      return res.status(400).json({
+        error: "One or more teams are invalid or don't belong to this tournament."
       });
     }
 
-    // Update teams with pool information as an object
+    // Update teams with pool information
     await Teams.updateMany(
-      { 
+      {
         team_id: { $in: team_ids },
         tournaments: tournament._id
       },
@@ -622,7 +626,7 @@ app.post("/api/:tournament_id/pool", async (req, res) => {
       }
     );
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Teams updated with pool information successfully.",
       updated_teams: team_ids,
       pool: {
@@ -633,9 +637,10 @@ app.post("/api/:tournament_id/pool", async (req, res) => {
 
   } catch (error) {
     console.error("Error updating pool information:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error." });
   }
 });
+
 
 
 app.get("/api/:tournament_id/teams", async (req, res) => {
@@ -779,43 +784,43 @@ app.get("/api/matches/:matchId", async (req, res) => {
 
 
 // NEW: API endpoint to update the score
-// app.post("/api/matches/:matchId/score", async (req, res) => {
-//   try {
-//     const { matchId } = req.params;
-//     const { teamName } = req.body;
+app.post("/api/matches/:matchId/score", async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { teamName } = req.body;
 
-//     const match = await Match.findOne({ match_id: matchId });
-//     if (!match) {
-//       return res.status(404).json({ message: "Match not found" });
-//     }
+    const match = await Match.findOne({ match_id: matchId });
+    if (!match) {
+      return res.status(404).json({ message: "Match not found" });
+    }
 
-//     // Find the team by name to determine which score to update
-//     const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
-//     const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
+    // Find the team by name to determine which score to update
+    const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
+    const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
 
-//     if (homeTeam && homeTeam.team_name === teamName) {
-//         match.home_score = (match.home_score || 0) + 1;
-//     } else if (awayTeam && awayTeam.team_name === teamName) {
-//         match.away_score = (match.away_score || 0) + 1;
-//     } else {
-//         return res.status(400).json({ message: "Invalid team name provided." });
-//     }
+    if (homeTeam && homeTeam.team_name === teamName) {
+        match.home_score = (match.home_score || 0) + 1;
+    } else if (awayTeam && awayTeam.team_name === teamName) {
+        match.away_score = (match.away_score || 0) + 1;
+    } else {
+        return res.status(400).json({ message: "Invalid team name provided." });
+    }
     
-//     const updatedMatch = await match.save();
+    const updatedMatch = await match.save();
     
-//     // Broadcast the update to all clients
-//     io.emit("scoreUpdate", {
-//       matchId,
-//       homeScore: updatedMatch.home_score,
-//       awayScore: updatedMatch.away_score,
-//     });
+    // Broadcast the update to all clients
+    io.emit("scoreUpdate", {
+      matchId,
+      homeScore: updatedMatch.home_score,
+      awayScore: updatedMatch.away_score,
+    });
 
-//     res.status(200).json({ message: "Score updated successfully", match: updatedMatch });
-//   } catch (error) {
-//     console.error("Error updating score:", error);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
+    res.status(200).json({ message: "Score updated successfully", match: updatedMatch });
+  } catch (error) {
+    console.error("Error updating score:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 
 io.on("connection", (socket) => {
@@ -844,33 +849,33 @@ app.get("/api/users/phone/:phone_number", async (req, res) => {
 });
 
 // NEW: API endpoint to update the score
-// app.post("/api/matches/:matchId/score", async (req, res) => {
-//   const matchId = req.params.matchId;
-//   const { teamName } = req.body;
+app.post("/api/matches/:matchId/score", async (req, res) => {
+  const matchId = req.params.matchId;
+  const { teamName } = req.body;
   
-//   try {
-//     const match = await Match.findById(matchId);
-//     if (!match) return res.status(404).json({ message: "Match not found" });
+  try {
+    const match = await Match.findById(matchId);
+    if (!match) return res.status(404).json({ message: "Match not found" });
 
-//     if (teamName === match.home_team_name) {
-//       match.home_score += 1;
-//     } else if (teamName === match.away_team_name) {
-//       match.away_score += 1;
-//     }
-//     await match.save();
-// 
-//    // ✅ Emit to dashboards
-//    // io.emit("scoreUpdate", {
-//    //   matchId,
-//    //   homeScore: match.home_score,
-//    //   awayScore: match.away_score
-//    // });
-// 
-//     res.json(match);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+    if (teamName === match.home_team_name) {
+      match.home_score += 1;
+    } else if (teamName === match.away_team_name) {
+      match.away_score += 1;
+    }
+    await match.save();
+
+    // ✅ Emit to dashboards
+    // io.emit("scoreUpdate", {
+    //   matchId,
+    //   homeScore: match.home_score,
+    //   awayScore: match.away_score
+    // });
+
+    res.json(match);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Add a new event to a match
 app.post('/api/matches/:matchId/events', async (req, res) => {
@@ -918,7 +923,7 @@ app.post('/api/matches/:matchId/score', async (req, res) => {
     const { matchId } = req.params;
     const { teamName } = req.body;
 
-    const match = await MatchLive.findOne({ match_id: matchId.trim() });
+    const match = await MatchLive.findOne({ match_id: matchId });
     if (!match) return res.status(404).json({ error: "Match not found" });
 
     if (teamName === match.team1_name) match.team1_score++;
@@ -1072,8 +1077,8 @@ io.on("connection", (socket) => {
     // emit globally instead of io.to(matchId)
     io.emit("scoreUpdated", {
       match_id: matchId,
-      team1_score: team1_score,
-      team2_score: team2_score,
+      team1_score: team === "team1" ? score : undefined,
+      team2_score: team === "team2" ? score : undefined,
       status: "Live"
     });
 
