@@ -564,7 +564,7 @@ app.get("/api/tournaments", async (req, res) => {
   }
 });
 
-app.post("/api/:tournament_id/pool", async (req, res) => {
+app.put("/api/:tournament_id/pool", async (req, res) => {
   try {
     const { tournament_id } = req.params;
     const { pool_name, pool_type, teams } = req.body;
@@ -582,18 +582,18 @@ app.post("/api/:tournament_id/pool", async (req, res) => {
     if (!tournament) {
       return res.status(404).json({ error: "Tournament not found." });
     }
-
+    console.log(113, tournament._id);
     // Check if the pool name already exists in this tournament
-    const existingPool = await Teams.findOne({
-      tournaments: tournament._id,
-      'pool.name': pool_name
-    });
+    // const existingPool = await Teams.findOne({
+    //   tournaments: tournament._id,
+    //   'pool.name': pool_name
+    // });
 
-    if (existingPool) {
-      return res.status(400).json({
-        error: "Pool name must be unique within the tournament."
-      });
-    }
+    // if (existingPool) {
+    //   return res.status(400).json({
+    //     error: "Pool name must be unique within the tournament."
+    //   });
+    // }
 
     // Extract team IDs from the request
     const team_ids = teams.map((team) => team.team_id);
@@ -601,7 +601,7 @@ app.post("/api/:tournament_id/pool", async (req, res) => {
     // Validate that all teams exist and belong to the tournament
     const teamsExist = await Teams.find({
       team_id: { $in: team_ids },
-      tournament_id: tournament_id
+      tournament_id: tournament._id
     });
 
     if (teamsExist.length !== team_ids.length) {
