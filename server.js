@@ -611,20 +611,22 @@ app.put("/api/:tournament_id/pool", async (req, res) => {
     }
 
     // Update teams with pool information
-    await Teams.updateMany(
-      {
-        team_id: { $in: team_ids },
-        tournaments: tournament._id
+   const updateResult = await Teams.updateMany(
+  {
+    team_id: { $in: team_ids },
+    tournament_id: tournament._id
+  },
+  {
+    $set: {
+      pool: {
+        name: pool_name,
+        type: pool_type
       },
-      {
-        $set: {
-          pool: {
-            name: pool_name,
-            type: pool_type
-          }
-        }
-      }
-    );
+      updated_at: new Date()
+    }
+  }
+);
+console.log("Update result:", updateResult);
 
     res.status(200).json({
       message: "Teams updated with pool information successfully.",
