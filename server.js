@@ -643,6 +643,62 @@ console.log("Update result:", updateResult);
   }
 });
 
+app.get("/api/tournaments/:tournament_id/add-list", async (req, res) => {
+  try {
+    const { tournament_id } = req.params;
+
+    // Find the tournament
+    const tournament = await AddTournament.findOne({ tournament_id });
+    if (!tournament) {
+      return res.status(404).json({ error: "Tournament not found." });
+    }
+    console.log(194, tournament._id);
+
+    // Get all teams in this tournament with their pool information
+    const teams = await Teams.find({ 
+      tournament_id: tournament._id 
+    }).select('team_id team_name city pool'); // Select only needed fields
+
+    // Group teams by pool
+    const poolGroups = teams.reduce((acc, team) => {
+      if (team.pool && team.pool.name) {
+        if (!acc[team.pool.name]) {
+          acc[team.pool.name] = {
+            name: team.pool.name,
+            type: team.pool.type,
+            teams: []
+          };
+        }
+        acc[team.pool.name].teams.push({
+          team_id: team.team_id,
+          team_name: team.team_name,
+          city: team.city
+        });
+      }
+      return acc;
+    }, {});
+    console.log("Pool groups:", poolGroups);
+
+    // Convert to array format
+    const pools = Object.values(poolGroups);
+
+    res.status(200).json({
+      tournament_id: tournament_id,
+      pools: pools,
+      all_teams: teams.map(team => ({
+        team_id: team.team_id,
+        team_name: team.team_name,
+        city: team.city,
+        pool: team.pool
+      }))
+    });
+
+
+  } catch (error) {
+    console.error("Error fetching pool information:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+});
 
 
 app.get("/api/:tournament_id/teams", async (req, res) => {
