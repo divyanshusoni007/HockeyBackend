@@ -817,7 +817,7 @@ app.post('/api/matches/:matchId/timer', async (req, res) => {
 app.get("/api/matches/:matchId", async (req, res) => {
   try {
     const { matchId } = req.params;
-    const match = await Match.findOne({ match_id: matchId });
+    const match = await MatchLive.findOne({ match_id: matchId });
     if (!match) {
       return res.status(404).json({ message: "Match not found" });
     }
