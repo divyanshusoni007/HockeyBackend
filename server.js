@@ -201,7 +201,7 @@ app.post("/api/match", async (req, res) => {
       tournament_name, // Changed from tournament_id
       home_team_name, // Changed from home_team_id
       away_team_name, // Changed from away_team_id
-      rounds,
+      // rounds, //removed rounds in 21 nov
       match_type,
       city,
       venue,
