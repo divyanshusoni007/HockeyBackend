@@ -274,7 +274,7 @@ app.post("/api/match", async (req, res) => {
     const newMatch = new Match({
       match_id,
       tournament_id,
-      rounds,
+      // rounds,
       home_team_id,
       away_team_id,
       match_type,
