@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const MatchSchema = new mongoose.Schema({
   match_id: String,
+  tournament_id: String,
   home_team_name: String,
   away_team_name: String,
   venue: String,

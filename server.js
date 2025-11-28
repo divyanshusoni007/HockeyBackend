@@ -50,6 +50,16 @@ app.get('/api/matches', async (req, res) => {
   }
 });
 
+app.get('/api/tournamentId/:tournamentId/matches', async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+    const matches = await Match.find({ tournament_id: tournamentId });
+    res.json(matches);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get("/api/matchlive/:matchId", async (req, res) => {
   try {
     const { matchId } = req.params;
@@ -211,7 +221,7 @@ app.post("/api/match", async (req, res) => {
       scorer_name,
       // home_score, away_score, winner_team_id are excluded as they'll be updated later
     } = req.body;
-
+console.log("Received request to add match:", req.body);
     // --- Fetch tournament_id from tournament_name ---
     if (!tournament_name) {
       return res.status(400).json({ error: "Tournament name is required." });
@@ -275,8 +285,8 @@ app.post("/api/match", async (req, res) => {
       match_id,
       tournament_id,
       // rounds,
-      home_team_id,
-      away_team_id,
+      home_team_name,
+      away_team_name,
       match_type,
       city,
       venue,
@@ -327,6 +337,25 @@ app.get("/api/users/phone/:phone_number", async (req, res) => {
   }
 });
 
+
+app.get("/api/team/:team_id", async (req, res) => {
+  try {
+    const { team_id } = req.params;
+    if (!team_id) {
+      return res.status(400).json({ error: "Team ID is missing from the URL." });
+    }
+
+    const team = await Teams.findOne({ team_id }).select("-__v");
+    if (!team) {
+      return res.status(404).json({ error: `Team with ID "${team_id}" not found.` });
+    }
+
+    res.status(200).json(team);
+  } catch (error) {
+    console.error("Error fetching team:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 // POST METHOD FOR ADD TOURNAMENTS
 app.post("/api/addtournaments", async (req, res) => {
