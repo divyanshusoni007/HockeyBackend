@@ -50,6 +50,35 @@ app.get('/api/matches', async (req, res) => {
   }
 });
 
+// GET all match lives for a specific tournament by tournament name
+app.get('/api/:tournamentname/matchlives', async (req, res) => {
+  try {
+    const { tournamentname } = req.params;
+
+    if (!tournamentname) {
+      return res.status(400).json({ error: "Tournament name is required." });
+    }
+
+    // Find the tournament by name
+    const tournament = await AddTournament.findOne({ tournament_name: tournamentname });
+    if (!tournament) {
+      return res.status(404).json({ error: "Tournament not found." });
+    }
+
+    // Find matches by tournament_id
+    const matches = await MatchLive.find({ tournament_id: tournament.tournament_id });
+
+    if (matches.length === 0) {
+      return res.status(404).json({ message: "No matches found for this tournament." });
+    }
+
+    res.status(200).json(matches);
+  } catch (error) {
+    console.error("Error fetching match lives:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/tournamentId/:tournamentId/matches', async (req, res) => {
   try {
     const { tournamentId } = req.params;
