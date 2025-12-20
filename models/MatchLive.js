@@ -10,6 +10,7 @@ const eventSchema = new mongoose.Schema({
 
 const MatchLiveSchema = new mongoose.Schema({
   match_id: { type: String, required: true, unique: true },
+  tournament_id: { type: String }, // store tournament identifier like 'TOUR001'
 
   // Match basics
   team1_name: String,
@@ -36,6 +37,9 @@ const MatchLiveSchema = new mongoose.Schema({
   // Players
   team1_players: [String],
   team2_players: [String],
+  // Optional team ids (useful to link to Teams collection)
+  team1_id: { type: String },
+  team2_id: { type: String },
 
   // Timer
   total_seconds: { type: Number, default: 0 }, // Remaining time in seconds
