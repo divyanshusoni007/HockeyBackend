@@ -698,7 +698,7 @@ app.post("/api/tournament/:tournament_id/team", async (req, res) => {
       team_id, // Auto-generated
      tournament_id: tournaments._id, // Fetched from URL
       team_name,
-      city,
+      location: city,
       logo_url,
     });
    // console.log("New team object:", newTeam);
@@ -720,6 +720,90 @@ app.post("/api/tournament/:tournament_id/team", async (req, res) => {
       return res.status(409).json({ error: errorMessage });
     }
     res.status(500).json({ error: "Server error: Could not add team." });
+  }
+});
+
+// PUT METHOD FOR UPDATING TEAM NAME
+app.put("/api/teams/:team_id", async (req, res) => {
+  try {
+    const { team_id } = req.params;
+    const { team_name } = req.body;
+
+    if (!team_id) {
+      return res.status(400).json({ error: "Team ID is required." });
+    }
+
+    if (!team_name || team_name.trim() === "") {
+      return res.status(400).json({ error: "Team name is required." });
+    }
+
+    // Find and update the team
+    const updatedTeam = await Teams.findOneAndUpdate(
+      { team_id },
+      { team_name: team_name.trim() },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTeam) {
+      return res.status(404).json({ error: "Team not found." });
+    }
+
+    res.status(200).json({
+      message: "Team name updated successfully",
+      team: updatedTeam
+    });
+  } catch (error) {
+    console.error("Error updating team:", error);
+    if (error.code === 11000) {
+      return res.status(409).json({ error: "A team with this name already exists." });
+    }
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE METHOD FOR TEAMS
+app.delete("/api/teams/:team_id", async (req, res) => {
+  try {
+    const { team_id } = req.params;
+
+    if (!team_id) {
+      return res.status(400).json({ error: "Team ID is required." });
+    }
+
+    // Find the team
+    const team = await Teams.findOne({ team_id });
+    if (!team) {
+      return res.status(404).json({ error: "Team not found." });
+    }
+
+    // Check for related team members
+    // const relatedMembers = await TeamMembers.find({ team_id: team.team_id });
+    // if (relatedMembers.length > 0) {
+    //   return res.status(409).json({
+    //     error: "Cannot delete team. It has associated members. Please remove members first."
+    //   });
+    // }
+
+    // Check for related matches (team1_id or team2_id)
+    // const relatedMatches = await MatchLive.find({
+    //   $or: [{ team1_id: team.team_id }, { team2_id: team.team_id }]
+    // });
+    // if (relatedMatches.length > 0) {
+    //   return res.status(409).json({
+    //     error: "Cannot delete team. It has associated matches. Please delete matches first."
+    //   });
+    // }
+
+    // Proceed to delete
+    await Teams.findOneAndDelete({ team_id });
+
+    res.status(200).json({
+      message: "Team deleted successfully",
+      deleted_team_id: team_id
+    });
+  } catch (error) {
+    console.error("Error deleting team:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
