@@ -504,6 +504,7 @@ app.post("/api/addtournaments", async (req, res) => {
       format,
       tournament_category,
       match_type,
+      ground_type,
     } = req.body;
 
     // --- Generate tournament_id ---
@@ -534,6 +535,7 @@ app.post("/api/addtournaments", async (req, res) => {
       format,
       tournament_category,
       match_type,
+      ground_type,
     });
     console.log("New tournament object:", newTournament);
 
@@ -551,6 +553,93 @@ app.post("/api/addtournaments", async (req, res) => {
         error: "A tournament with this ID already exists. Please try again.",
       });
     }
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PUT METHOD FOR UPDATE TOURNAMENTS
+app.put("/api/tournaments/:tournament_id", async (req, res) => {
+  try {
+    const { tournament_id } = req.params;
+
+    // ✅ Allowed fields only
+    const allowedFields = ["tournament_name", "start_date", "end_date"];
+
+    // ✅ Filter request body
+    const updateData = {};
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    // ❌ No valid fields provided
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        error: "Only tournament_name, start_date, end_date can be updated."
+      });
+    }
+
+    const updatedTournament = await AddTournament.findOneAndUpdate(
+      { tournament_id },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTournament) {
+      return res.status(404).json({ error: "Tournament not found" });
+    }
+
+    res.status(200).json({
+      message: "Tournament updated successfully",
+      tournament: updatedTournament
+    });
+  } catch (error) {
+    console.error("Error updating tournament:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE METHOD FOR TOURNAMENTS
+app.delete("/api/tournaments/:tournament_id", async (req, res) => {
+  try {
+    const { tournament_id } = req.params;
+
+    if (!tournament_id) {
+      return res.status(400).json({ error: "Tournament ID is required." });
+    }
+
+    // Find the tournament
+    const tournament = await AddTournament.findOne({ tournament_id });
+    if (!tournament) {
+      return res.status(404).json({ error: "Tournament not found." });
+    }
+
+    // Check for related teams
+    const relatedTeams = await Teams.find({ tournament_id: tournament._id });
+    if (relatedTeams.length > 0) {
+      return res.status(409).json({
+        error: "Cannot delete tournament. It has associated teams. Please delete teams first."
+      });
+    }
+
+    // Check for related match lives
+    const relatedMatches = await MatchLive.find({ tournament_id: tournament.tournament_id });
+    if (relatedMatches.length > 0) {
+      return res.status(409).json({
+        error: "Cannot delete tournament. It has associated matches. Please delete matches first."
+      });
+    }
+
+    // Proceed to delete
+    await AddTournament.findOneAndDelete({ tournament_id });
+
+    res.status(200).json({
+      message: "Tournament deleted successfully",
+      deleted_tournament_id: tournament_id
+    });
+  } catch (error) {
+    console.error("Error deleting tournament:", error);
     res.status(500).json({ error: "Server error" });
   }
 });

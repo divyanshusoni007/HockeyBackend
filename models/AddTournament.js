@@ -10,6 +10,7 @@ const AddTournamentSchema = new mongoose.Schema({
   format: { type: String },
   tournament_category: { type: String },
   match_type: { type: String },
+  ground_type: { type: String },
   // Removed referee_id and scorer_id from schema based on your provided schema
 });
 
