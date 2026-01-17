@@ -450,6 +450,36 @@ app.post("/api/:tournamentname/addMatchLive", async (req, res) => {
   }
 });
 
+// DELETE METHOD FOR MATCHES
+app.delete("/api/matches/:matchId", async (req, res) => {
+  try {
+    const { matchId } = req.params;
+
+    if (!matchId) {
+      return res.status(400).json({ error: "Match ID is required." });
+    }
+
+    const match = await MatchLive.findOne({ match_id: matchId });
+    if (!match) {
+      return res.status(404).json({ error: "Match not found." });
+    }
+
+    // Proceed to delete
+    await MatchLive.findOneAndDelete({ match_id: matchId });
+
+    // Emit socket event to notify clients
+    io.emit("matchDeleted", { match_id: matchId });
+
+    res.status(200).json({
+      message: "Match deleted successfully",
+      deleted_match_id: matchId
+    });
+  } catch (error) {
+    console.error("Error deleting match:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // GET user by phone number to autofill organizer name
 app.get("/api/users/phone/:phone_number", async (req, res) => {
   try {
