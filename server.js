@@ -4,9 +4,13 @@ const express = require("express");
 const http = require("http");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const https = require('https');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const Match = require("./models/Match");
 const MatchLive = require('./models/MatchLive');
+const User = require('./models/User');
 
 const app = express();
 const server = http.createServer(app);
@@ -39,6 +43,62 @@ mongoose
 app.get("/", (req, res) => {
   res.send("Hockey App Backend Running");
 });
+
+
+// 🔹 Phone.Email OTP verification route
+app.post('/auth/phone-email', (req, res) => {
+  const { user_json_url } = req.body;
+
+  if (!user_json_url) {
+    return res.status(400).json({ error: 'user_json_url missing' });
+  }
+
+  https.get(user_json_url, (response) => {
+    let data = '';
+
+    response.on('data', chunk => {
+      data += chunk;
+    });
+
+    response.on('end', async () => {
+      try {
+        const jsonData = JSON.parse(data);
+
+        const phone = jsonData.user_phone_number;
+        const firstName = jsonData.user_first_name || '';
+        const lastName = jsonData.user_last_name || '';
+        const fullName = `${firstName} ${lastName}`.trim() || 'New User';
+
+        let user = await User.findOne({ phone_number: phone });
+
+        // REGISTER if new user
+        if (!user) {
+          user = await User.create({
+            user_id: crypto.randomUUID(),
+            full_name: fullName,
+            phone_number: phone
+          });
+        }
+
+        // LOGIN → JWT
+        const token = jwt.sign(
+          { userId: user._id, phone: user.phone_number },
+          'JWT_SECRET_KEY',
+          { expiresIn: '7d' }
+        );
+
+        res.json({ token });
+
+      } catch (err) {
+        res.status(500).json({ error: 'Phone verification failed' });
+      }
+    });
+
+  }).on('error', (err) => {
+    res.status(500).json({ error: err.message });
+  });
+});
+
 
 // GET all matches for the dashboard
 app.get('/api/matches', async (req, res) => {
@@ -1554,7 +1614,7 @@ const nodemailer = require("nodemailer");
 const AddTournament = require("./models/AddTournament");
 const Teams = require("./models/Teams");
 const TeamMembers = require("./models/TeamMembers");
-const User = require("./models/User");
+
 app.post("/api/send-email", async (req, res) => {
   try {
     const { name, email, message } = req.body;
