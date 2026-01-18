@@ -990,73 +990,87 @@ app.get("/api/tournaments", async (req, res) => {
   }
 });
 
+//PUT METHOD FOR UPDATING POOL INFORMATION
 app.put("/api/:tournament_id/pool", async (req, res) => {
   try {
     const { tournament_id } = req.params;
     const { pool_name, pool_type, teams } = req.body;
-    console.log("Received pool creation request:", req.body);
 
-    // Validate request body
-    if (!pool_name || !pool_type || !teams || teams.length === 0) {
+    if (!pool_name || !pool_type || !Array.isArray(teams)) {
       return res.status(400).json({
-        error: "Pool name, pool type and teams are required."
+        error: "Pool name, pool type and teams array are required."
       });
     }
 
-    // Find the tournament
+    // Find tournament
     const tournament = await AddTournament.findOne({ tournament_id });
     if (!tournament) {
       return res.status(404).json({ error: "Tournament not found." });
     }
-    console.log(113, tournament._id);
-    // Check if the pool name already exists in this tournament
-    // const existingPool = await Teams.findOne({
-    //   tournaments: tournament._id,
-    //   'pool.name': pool_name
-    // });
 
-    // if (existingPool) {
-    //   return res.status(400).json({
-    //     error: "Pool name must be unique within the tournament."
-    //   });
-    // }
+    // Incoming selected team IDs
+    const selectedTeamIds = teams.map(t => t.team_id);
 
-    // Extract team IDs from the request
-    const team_ids = teams.map((team) => team.team_id);
+    // 1️⃣ Get teams already assigned to this pool
+    const existingPoolTeams = await Teams.find({
+      tournament_id: tournament._id,
+      "pool.name": pool_name
+    });
 
-    // Validate that all teams exist and belong to the tournament
+    const existingTeamIds = existingPoolTeams.map(t => t.team_id);
+
+    // 2️⃣ Find deselected teams
+    const deselectedTeamIds = existingTeamIds.filter(
+      id => !selectedTeamIds.includes(id)
+    );
+
+    // 3️⃣ Remove pool info from deselected teams
+    if (deselectedTeamIds.length > 0) {
+      await Teams.updateMany(
+        {
+          team_id: { $in: deselectedTeamIds },
+          tournament_id: tournament._id
+        },
+        {
+          $unset: { pool: "" },
+          $set: { updated_at: new Date() }
+        }
+      );
+    }
+
+    // 4️⃣ Validate selected teams
     const teamsExist = await Teams.find({
-      team_id: { $in: team_ids },
+      team_id: { $in: selectedTeamIds },
       tournament_id: tournament._id
     });
 
-    if (teamsExist.length !== team_ids.length) {
+    if (teamsExist.length !== selectedTeamIds.length) {
       return res.status(400).json({
         error: "One or more teams are invalid or don't belong to this tournament."
       });
     }
 
-    // Update teams with pool information
-   const updateResult = await Teams.updateMany(
-  {
-    team_id: { $in: team_ids },
-    tournament_id: tournament._id
-  },
-  {
-    $set: {
-      pool: {
-        name: pool_name,
-        type: pool_type
+    // 5️⃣ Assign pool to selected teams
+    await Teams.updateMany(
+      {
+        team_id: { $in: selectedTeamIds },
+        tournament_id: tournament._id
       },
-      updated_at: new Date()
-    }
-  }
-);
-console.log("Update result:", updateResult);
+      {
+        $set: {
+          pool: {
+            name: pool_name,
+            type: pool_type
+          },
+          updated_at: new Date()
+        }
+      }
+    );
 
     res.status(200).json({
-      message: "Teams updated with pool information successfully.",
-      updated_teams: team_ids,
+      message: "Pool updated successfully.",
+      assigned_teams: selectedTeamIds,
+      removed_teams: deselectedTeamIds,
       pool: {
         name: pool_name,
         type: pool_type
@@ -1065,6 +1079,133 @@ console.log("Update result:", updateResult);
 
   } catch (error) {
     console.error("Error updating pool information:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
+
+// app.put("/api/:tournament_id/pool", async (req, res) => {
+//   try {
+//     const { tournament_id } = req.params;
+//     const { pool_name, pool_type, teams } = req.body;
+//     console.log("Received pool creation request:", req.body);
+
+//     // Validate request body
+//     if (!pool_name || !pool_type || !teams || teams.length === 0) {
+//       return res.status(400).json({
+//         error: "Pool name, pool type and teams are required."
+//       });
+//     }
+
+//     // Find the tournament
+//     const tournament = await AddTournament.findOne({ tournament_id });
+//     if (!tournament) {
+//       return res.status(404).json({ error: "Tournament not found." });
+//     }
+//     console.log(113, tournament._id);
+//   //  Check if the pool name already exists in this tournament
+//     const existingPool = await Teams.findOne({
+//       tournaments: tournament._id,
+//       'pool.name': pool_name
+//     });
+
+//     if (existingPool) {
+//       return res.status(400).json({
+//         error: "Pool name must be unique within the tournament."
+//       });
+//     }
+
+//     // Extract team IDs from the request
+//     const team_ids = teams.map((team) => team.team_id);
+
+//     // Validate that all teams exist and belong to the tournament
+//     const teamsExist = await Teams.find({
+//       team_id: { $in: team_ids },
+//       tournament_id: tournament._id
+//     });
+
+//     if (teamsExist.length !== team_ids.length) {
+//       return res.status(400).json({
+//         error: "One or more teams are invalid or don't belong to this tournament."
+//       });
+//     }
+
+//     // Update teams with pool information
+//    const updateResult = await Teams.updateMany(
+//   {
+//     team_id: { $in: team_ids },
+//     tournament_id: tournament._id
+//   },
+//   {
+//     $set: {
+//       pool: {
+//         name: pool_name,
+//         type: pool_type
+//       },
+//       updated_at: new Date()
+//     }
+//   }
+// );
+// console.log("Update result:", updateResult);
+
+//     res.status(200).json({
+//       message: "Teams updated with pool information successfully.",
+//       updated_teams: team_ids,
+//       pool: {
+//         name: pool_name,
+//         type: pool_type
+//       }
+//     });
+
+//   } catch (error) {
+//     console.error("Error updating pool information:", error);
+//     res.status(500).json({ error: "Server error." });
+//   }
+// });
+
+// DELETE METHOD FOR POOL
+app.delete("/api/:tournament_id/pool", async (req, res) => {
+  try {
+    const { tournament_id } = req.params;
+    const { pool_name } = req.body;
+
+    // Validate request body
+    if (!pool_name) {
+      return res.status(400).json({
+        error: "Pool name is required."
+      });
+    }
+
+    // Find the tournament
+    const tournament = await AddTournament.findOne({ tournament_id });
+    if (!tournament) {
+      return res.status(404).json({ error: "Tournament not found." });
+    }
+
+    // Remove pool from teams in this tournament with the specified pool name
+    const updateResult = await Teams.updateMany(
+      {
+        tournament_id: tournament._id,
+        'pool.name': pool_name
+      },
+      {
+        $unset: { pool: 1 },
+        $set: { updated_at: new Date() }
+      }
+    );
+
+    if (updateResult.modifiedCount === 0) {
+      return res.status(404).json({ error: "Pool not found or no teams in this pool." });
+    }
+
+    res.status(200).json({
+      message: "Pool deleted successfully.",
+      deleted_pool: pool_name,
+      affected_teams: updateResult.modifiedCount
+    });
+
+  } catch (error) {
+    console.error("Error deleting pool:", error);
     res.status(500).json({ error: "Server error." });
   }
 });
