@@ -56,45 +56,71 @@ app.post('/auth/phone-email', (req, res) => {
   https.get(user_json_url, (response) => {
     let data = '';
 
+    // 🔴 IMPORTANT: check status code
+    if (response.statusCode !== 200) {
+      return res.status(500).json({
+        error: 'Failed to fetch Phone.Email verification data'
+      });
+    }
+
     response.on('data', chunk => {
       data += chunk;
     });
 
     response.on('end', async () => {
       try {
+        // 🔍 DEBUG (temporarily)
+        console.log('Phone.Email raw response:', data);
+
         const jsonData = JSON.parse(data);
 
         const phone = jsonData.user_phone_number;
+        if (!phone) {
+          return res.status(400).json({
+            error: 'Phone number not found in Phone.Email response'
+          });
+        }
+
         const firstName = jsonData.user_first_name || '';
         const lastName = jsonData.user_last_name || '';
         const fullName = `${firstName} ${lastName}`.trim() || 'New User';
 
         let user = await User.findOne({ phone_number: phone });
 
-        // REGISTER if new user
         if (!user) {
           user = await User.create({
-            user_id: crypto.randomUUID(),
+            user_id: crypto.randomUUID
+              ? crypto.randomUUID()
+              : crypto.randomBytes(16).toString('hex'),
             full_name: fullName,
             phone_number: phone
           });
         }
 
-        // LOGIN → JWT
+        // 🔐 Make sure JWT secret exists
+        if (!process.env.JWT_SECRET_KEY) {
+          throw new Error('JWT_SECRET_KEY not defined');
+        }
+
         const token = jwt.sign(
           { userId: user._id, phone: user.phone_number },
-          'JWT_SECRET_KEY',
+          process.env.JWT_SECRET_KEY,
           { expiresIn: '7d' }
         );
 
         res.json({ token });
 
       } catch (err) {
-        res.status(500).json({ error: 'Phone verification failed' });
+        console.error('Phone.Email verification error:', err);
+        res.status(500).json({
+          error: 'Phone verification failed',
+          details: err.message
+        });
       }
     });
 
   }).on('error', (err) => {
+    console.error('HTTPS error:', err);
     res.status(500).json({ error: err.message });
   });
 });
@@ -136,6 +162,100 @@ app.get('/api/:tournamentname/matchlives', async (req, res) => {
   } catch (error) {
     console.error("Error fetching match lives:", error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/player-stats/:userId', async (req, res) => {
+  console.log('Player stats API hit');
+  const playerId = req.params.userId;
+  console.log('Player stats API hit');
+
+  try {
+    const stats = await MatchLive.aggregate([
+      { $unwind: '$match_events' },
+
+      { $match: { 'match_events.player_id': playerId } },
+
+      {
+        $group: {
+          _id: null,
+          matches: { $addToSet: '$match_id' },
+
+          goals: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Goal'] }, 1, 0]
+            }
+          },
+
+          pc: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Corner Scored'] }, 1, 0]
+            }
+          },
+
+          ps: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Stroke Scored'] }, 1, 0]
+            }
+          },
+
+          redCards: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Red Card'] }, 1, 0]
+            }
+          },
+
+          yellowCards: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Yellow Card'] }, 1, 0]
+            }
+          },
+
+          greenCards: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Green Card'] }, 1, 0]
+            }
+          },
+
+          penaltyShootout: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout'] }, 1, 0]
+            }
+          }
+        }
+      },
+
+      {
+        $project: {
+          _id: 0,
+          totalMatches: { $size: '$matches' },
+          goals: 1,
+          pc: 1,
+          ps: 1,
+          redCards: 1,
+          yellowCards: 1,
+          greenCards: 1,
+          penaltyShootout: 1,
+          totalGoalScore: {
+            $add: ['$goals', '$pc', '$ps', '$penaltyShootout']
+          }
+        }
+      }
+    ]);
+
+    res.json(stats[0] || {
+      totalMatches: 0,
+      goals: 0,
+      pc: 0,
+      ps: 0,
+      redCards: 0,
+      yellowCards: 0,
+      greenCards: 0,
+      penaltyShootout: 0,
+      totalGoalScore: 0
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Error calculating stats', error: err.message });
   }
 });
 
@@ -1294,7 +1414,7 @@ const teams = await Teams.find({ tournament_id: tournamentExists._id });
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
-})
+});
 
 app.get("/api/team/:team_id/members", async (req, res) => {
   try {
@@ -1326,7 +1446,18 @@ app.get("/api/team/:team_id/members", async (req, res) => {
 app.get("/api/users/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params; // Extract match_id from URL parameters
-    const user = await User.findOne({ user_id: user_id });
+    const user = await User.findOne({ user_id: user_id },
+      {
+        _id: 0,
+        user_id: 1,
+        full_name: 1,
+        position: 1,
+        profile_pic: 1,
+        jersey_number: 1,
+        player_bio: 1,
+        player_stats: 1
+      }
+    );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
