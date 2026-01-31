@@ -168,7 +168,7 @@ app.get('/api/:tournamentname/matchlives', async (req, res) => {
 app.get('/api/player-stats/:userId', async (req, res) => {
   console.log('Player stats API hit');
   const playerId = req.params.userId;
-  console.log('Player stats API hit');
+  console.log('Player stats API hit', playerId);
 
   try {
     const stats = await MatchLive.aggregate([
@@ -242,6 +242,8 @@ app.get('/api/player-stats/:userId', async (req, res) => {
         }
       }
     ]);
+
+    console.log('Player stats aggregation complete', stats),
 
     res.json(stats[0] || {
       totalMatches: 0,
@@ -526,23 +528,125 @@ console.log("Received request to add match:", req.body);
 });
 
 // POST METHOD FOR ADD MATCH LIVE (create a live match record for a tournament)
+// app.post("/api/:tournamentname/addMatchLive", async (req, res) => {
+//   try {
+//     const { tournamentname } = req.params;
+
+//     if (!tournamentname) {
+//       return res.status(400).json({ error: "Tournament name is required in the URL." });
+//     }
+
+//     // verify tournament exists
+//     const tournament = await AddTournament.findOne({
+//       tournament_name: tournamentname,
+//     });
+//      if (!tournament) {
+//       return res.status(404).json({ error: "Tournament not found." });
+//     }
+
+//     // Accept either team1/team2 or home/away naming
+//     let {
+//       team1_name,
+//       team2_name,
+//       home_team_name,
+//       away_team_name,
+//       venue,
+//       match_date,
+//       match_time,
+//       team1_players = [],
+//       team2_players = [],
+//       match_id,
+//     } = req.body;
+
+//     team1_name = team1_name || home_team_name;
+//     team2_name = team2_name || away_team_name;
+
+//     if (!team1_name || !team2_name) {
+//       return res.status(400).json({ error: "Both team names are required." });
+//     }
+
+//     // verify both teams exist in this tournament
+//     const team1 = await Teams.findOne({ team_name: team1_name, tournament_id: tournament._id });
+//     if (!team1) {
+//       return res.status(404).json({ error: `Team "${team1_name}" not found in this tournament.` });
+//     }
+//     const team2 = await Teams.findOne({ team_name: team2_name, tournament_id: tournament._id });
+//     if (!team2) {
+//       return res.status(404).json({ error: `Team "${team2_name}" not found in this tournament.` });
+//     }
+
+//     // generate match_id if not provided
+//     if (!match_id) {
+//       const homePrefix = team1_name.substring(0, 3).toLowerCase();
+//       const awayPrefix = team2_name.substring(0, 3).toLowerCase();
+
+//       const lastMatch = await MatchLive.findOne({
+//         match_id: new RegExp(`^${homePrefix}${awayPrefix}\\d+$`, "i"),
+//       })
+//         .sort({ match_id: -1 })
+//         .exec();
+
+//       let nextNumber = 1;
+//       if (lastMatch && lastMatch.match_id) {
+//         const lastNumberMatch = lastMatch.match_id.match(/\d+$/);
+//         if (lastNumberMatch) {
+//           nextNumber = parseInt(lastNumberMatch[0], 10) + 1;
+//         }
+//       }
+//       match_id = `${homePrefix}${awayPrefix}${String(nextNumber).padStart(2, "0")}`;
+//     } else {
+//       // ensure uniqueness
+//       const exists = await MatchLive.findOne({ match_id });
+//       if (exists) {
+//         return res.status(409).json({ error: "A MatchLive with this match_id already exists." });
+//       }
+//     }
+
+//     const newMatchLive = new MatchLive({
+//       match_id,
+//       tournament_id: tournament.tournament_id,
+//       team1_id: team1.team_id,
+//       team2_id: team2.team_id,
+//       team1_name,
+//       team2_name,
+//       venue,
+//       match_date,
+//       match_time,
+//       team1_players,
+//       team2_players,
+//       updated_at: new Date(),
+//     });
+
+//     await newMatchLive.save();
+
+//     // emit to sockets so frontends can react
+//     io.emit("matchLiveAdded", newMatchLive);
+
+//     res.status(201).json({ message: "MatchLive created successfully", matchLive: newMatchLive });
+//   } catch (error) {
+//     console.error("Error creating MatchLive:", error);
+//     if (error.code === 11000) {
+//       return res.status(409).json({ error: "Duplicate match_id" });
+//     }
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
+
+
+// POST METHOD FOR ADD MATCH LIVE
 app.post("/api/:tournamentname/addMatchLive", async (req, res) => {
   try {
     const { tournamentname } = req.params;
 
-    if (!tournamentname) {
-      return res.status(400).json({ error: "Tournament name is required in the URL." });
-    }
-
-    // verify tournament exists
+    // 1️⃣ Find tournament
     const tournament = await AddTournament.findOne({
       tournament_name: tournamentname,
     });
-     if (!tournament) {
-      return res.status(404).json({ error: "Tournament not found." });
+
+    if (!tournament) {
+      return res.status(404).json({ error: "Tournament not found" });
     }
 
-    // Accept either team1/team2 or home/away naming
     let {
       team1_name,
       team2_name,
@@ -551,8 +655,6 @@ app.post("/api/:tournamentname/addMatchLive", async (req, res) => {
       venue,
       match_date,
       match_time,
-      team1_players = [],
-      team2_players = [],
       match_id,
     } = req.body;
 
@@ -560,75 +662,89 @@ app.post("/api/:tournamentname/addMatchLive", async (req, res) => {
     team2_name = team2_name || away_team_name;
 
     if (!team1_name || !team2_name) {
-      return res.status(400).json({ error: "Both team names are required." });
+      return res.status(400).json({ error: "Both team names are required" });
     }
 
-    // verify both teams exist in this tournament
-    const team1 = await Teams.findOne({ team_name: team1_name, tournament_id: tournament._id });
-    if (!team1) {
-      return res.status(404).json({ error: `Team "${team1_name}" not found in this tournament.` });
-    }
-    const team2 = await Teams.findOne({ team_name: team2_name, tournament_id: tournament._id });
-    if (!team2) {
-      return res.status(404).json({ error: `Team "${team2_name}" not found in this tournament.` });
+    // 2️⃣ Fetch teams WITH players populated
+    const team1 = await Teams.findOne({
+      team_name: team1_name,
+      tournament_id: tournament._id,
+    }).populate("players", "user_id name");
+
+    const team2 = await Teams.findOne({
+      team_name: team2_name,
+      tournament_id: tournament._id,
+    }).populate("players", "user_id name");
+
+    if (!team1 || !team2) {
+      return res.status(404).json({ error: "Team not found in tournament" });
     }
 
-    // generate match_id if not provided
+    // 3️⃣ Convert Users → MatchLive playerRefSchema
+    const team1_players = team1.players.map((u) => ({
+      player_id: u.user_id || u._id.toString(), // fallback safety
+      player_name: u.name,
+    }));
+
+    const team2_players = team2.players.map((u) => ({
+      player_id: u.user_id || u._id.toString(),
+      player_name: u.name,
+    }));
+
+    // 4️⃣ Generate match_id if not provided
     if (!match_id) {
-      const homePrefix = team1_name.substring(0, 3).toLowerCase();
-      const awayPrefix = team2_name.substring(0, 3).toLowerCase();
+      const h = team1_name.slice(0, 3).toLowerCase();
+      const a = team2_name.slice(0, 3).toLowerCase();
 
       const lastMatch = await MatchLive.findOne({
-        match_id: new RegExp(`^${homePrefix}${awayPrefix}\\d+$`, "i"),
-      })
-        .sort({ match_id: -1 })
-        .exec();
+        match_id: new RegExp(`^${h}${a}\\d+$`, "i"),
+      }).sort({ match_id: -1 });
 
-      let nextNumber = 1;
-      if (lastMatch && lastMatch.match_id) {
-        const lastNumberMatch = lastMatch.match_id.match(/\d+$/);
-        if (lastNumberMatch) {
-          nextNumber = parseInt(lastNumberMatch[0], 10) + 1;
-        }
+      let next = 1;
+      if (lastMatch?.match_id) {
+        const n = lastMatch.match_id.match(/\d+$/);
+        if (n) next = parseInt(n[0]) + 1;
       }
-      match_id = `${homePrefix}${awayPrefix}${String(nextNumber).padStart(2, "0")}`;
-    } else {
-      // ensure uniqueness
-      const exists = await MatchLive.findOne({ match_id });
-      if (exists) {
-        return res.status(409).json({ error: "A MatchLive with this match_id already exists." });
-      }
+
+      match_id = `${h}${a}${String(next).padStart(2, "0")}`;
     }
 
-    const newMatchLive = new MatchLive({
+    // 5️⃣ Create MatchLive
+    const matchLive = new MatchLive({
       match_id,
-      tournament_id: tournament.tournament_id,
-      team1_id: team1.team_id,
-      team2_id: team2.team_id,
+      tournament_id: tournament.tournament_id.toString(),
+
       team1_name,
       team2_name,
       venue,
       match_date,
       match_time,
+
+      team1_id: team1.team_id,
+      team2_id: team2.team_id,
+
       team1_players,
       team2_players,
+
       updated_at: new Date(),
     });
 
-    await newMatchLive.save();
+    await matchLive.save();
 
-    // emit to sockets so frontends can react
-    io.emit("matchLiveAdded", newMatchLive);
+    io.emit("matchLiveAdded", matchLive);
 
-    res.status(201).json({ message: "MatchLive created successfully", matchLive: newMatchLive });
-  } catch (error) {
-    console.error("Error creating MatchLive:", error);
-    if (error.code === 11000) {
-      return res.status(409).json({ error: "Duplicate match_id" });
-    }
+    res.status(201).json({
+      message: "MatchLive created with players fetched from teams",
+      matchLive,
+    });
+
+  } catch (err) {
+    console.error("Add MatchLive error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
 
 // DELETE METHOD FOR MATCHES
 app.delete("/api/matches/:matchId", async (req, res) => {
