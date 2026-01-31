@@ -680,15 +680,25 @@ app.post("/api/:tournamentname/addMatchLive", async (req, res) => {
       return res.status(404).json({ error: "Team not found in tournament" });
     }
 
-    // 3️⃣ Convert Users → MatchLive playerRefSchema
-    const team1_players = team1.players.map((u) => ({
-      player_id: u.user_id || u._id.toString(), // fallback safety
-      player_name: u.name,
+      // 2️⃣ Fetch players from TeamMembers
+    const team1Members = await TeamMembers.find({ team_id: team1.team_id });
+    const team2Members = await TeamMembers.find({ team_id: team2.team_id });
+
+    if (!team1Members.length || !team2Members.length) {
+      return res.status(400).json({
+        error: "One or both teams have no players"
+      });
+    }
+
+    // 3️⃣ Convert to MatchLive format
+    const team1_players = team1Members.map(p => ({
+      player_id: p.user_id,
+      player_name: p.name
     }));
 
-    const team2_players = team2.players.map((u) => ({
-      player_id: u.user_id || u._id.toString(),
-      player_name: u.name,
+    const team2_players = team2Members.map(p => ({
+      player_id: p.user_id,
+      player_name: p.name
     }));
 
     // 4️⃣ Generate match_id if not provided
