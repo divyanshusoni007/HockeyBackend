@@ -2211,13 +2211,20 @@ app.get("/api/matches/:matchId", async (req, res) => {
     const homeTeam = await Teams.findOne({ team_id: match.home_team_id });
     const awayTeam = await Teams.findOne({ team_id: match.away_team_id });
     
+   
     // Combine everything into a single response object
     const responseData = {
       ...match.toObject(),
       home_team_name: homeTeam?.team_name,
-      away_team_name: awayTeam?.team_name,
+      away_team_name: awayTeam?.team_name 
     };
-
+       const tournamentName = await AddTournament.findOne({ tournament_id: match.tournament_id });
+    if (tournamentName) {
+      responseData.tournament_name = tournamentName.tournament_name;
+    }
+    console.log("Match details fetched:", responseData); // Debug log
+   
+  
     res.status(200).json(responseData);
   } catch (error) {
     console.error("Error fetching match:", error);
