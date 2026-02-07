@@ -165,37 +165,271 @@ app.get('/api/:tournamentname/matchlives', async (req, res) => {
   }
 });
 
-app.get('/api/player-stats/:userId', async (req, res) => {
-  console.log('Player stats API hit');
+app.get('/api/player/:userId/teams', async (req, res) => {
   const playerId = req.params.userId;
-  console.log('Player stats API hit', playerId);
+
+  try {
+    const teams = await MatchLive.aggregate([
+      // 1️⃣ Identify matches where player participated
+      {
+        $addFields: {
+          playerTeam: {
+            $cond: [
+              { $in: [playerId, '$team1_players.player_id'] },
+              'team1',
+              {
+                $cond: [
+                  { $in: [playerId, '$team2_players.player_id'] },
+                  'team2',
+                  null
+                ]
+              }
+            ]
+          }
+        }
+      },
+
+      { $match: { playerTeam: { $ne: null } } },
+
+      // 2️⃣ Normalize team data
+      {
+        $project: {
+          match_id: 1,
+          teamName: {
+            $cond: [
+              { $eq: ['$playerTeam', 'team1'] },
+              '$team1_name',
+              '$team2_name'
+            ]
+          },
+          teamScore: {
+            $cond: [
+              { $eq: ['$playerTeam', 'team1'] },
+              '$team1_score',
+              '$team2_score'
+            ]
+          },
+          opponentScore: {
+            $cond: [
+              { $eq: ['$playerTeam', 'team1'] },
+              '$team2_score',
+              '$team1_score'
+            ]
+          }
+        }
+      },
+
+      // 3️⃣ Decide win / loss / draw
+      {
+        $addFields: {
+          result: {
+            $cond: [
+              { $gt: ['$teamScore', '$opponentScore'] },
+              'WIN',
+              {
+                $cond: [
+                  { $lt: ['$teamScore', '$opponentScore'] },
+                  'LOSS',
+                  'DRAW'
+                ]
+              }
+            ]
+          }
+        }
+      },
+
+      // 4️⃣ Group per team
+      {
+        $group: {
+          _id: '$teamName',
+          matches: { $sum: 1 },
+          wins: {
+            $sum: { $cond: [{ $eq: ['$result', 'WIN'] }, 1, 0] }
+          },
+          losses: {
+            $sum: { $cond: [{ $eq: ['$result', 'LOSS'] }, 1, 0] }
+          },
+          draws: {
+            $sum: { $cond: [{ $eq: ['$result', 'DRAW'] }, 1, 0] }
+          }
+        }
+      },
+
+      // 5️⃣ Final shape
+      {
+        $project: {
+          _id: 0,
+          teamName: '$_id',
+          matches: 1,
+          wins: 1,
+          losses: 1,
+          draws: 1
+        }
+      }
+    ]);
+
+    res.json(teams);
+  } catch (err) {
+    res.status(500).json({
+      message: 'Error fetching player teams',
+      error: err.message
+    });
+  }
+});
+
+app.get('/api/player/:userId/matches', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const matches = await MatchLive.find({
+      $or: [
+        { 'team1_players.player_id': userId },
+        { 'team2_players.player_id': userId }
+      ],
+      status: 'Finished'
+    }).sort({ match_date: -1 });
+
+    const enrichedMatches = matches.map(match => {
+      const isTeam1Player = match.team1_players.some(
+        p => p.player_id === userId
+      );
+
+      const playerTeam = isTeam1Player ? match.team1_name : match.team2_name;
+      const opponentTeam = isTeam1Player ? match.team2_name : match.team1_name;
+
+      const playerScore = isTeam1Player
+        ? match.team1_score
+        : match.team2_score;
+
+      const opponentScore = isTeam1Player
+        ? match.team2_score
+        : match.team1_score;
+
+      let result = 'DRAW';
+      if (playerScore > opponentScore) result = 'WIN';
+      else if (playerScore < opponentScore) result = 'LOSS';
+
+      return {
+        match_id: match.match_id,
+        match_date: match.match_date,
+        venue: match.venue,
+
+        playerTeam,
+        opponentTeam,
+        playerScore,
+        opponentScore,
+
+        result
+      };
+    });
+
+    res.json(enrichedMatches);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/player-stats/:userId', async (req, res) => {
+  const playerId = req.params.userId;
 
   try {
     const stats = await MatchLive.aggregate([
-      { $unwind: '$match_events' },
 
-      { $match: { 'match_events.player_id': playerId } },
+      // 1️⃣ Matches where player was in squad (Live + Finished)
+      {
+        $match: {
+          status: { $in: ['Live', 'Finished'] },
+          $or: [
+            { 'team1_players.player_id': playerId },
+            { 'team2_players.player_id': playerId }
+          ]
+        }
+      },
 
+      // 2️⃣ Fix match universe first
+      {
+        $group: {
+          _id: '$match_id',
+          match_events: { $first: '$match_events' }
+        }
+      },
+
+      // 3️⃣ Unwind events AFTER matches are locked
+      {
+        $unwind: {
+          path: '$match_events',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // 4️⃣ Keep only this player's events (or none)
+      {
+        $match: {
+          $or: [
+            { 'match_events.player_id': playerId },
+            { match_events: null }
+          ]
+        }
+      },
+
+      // 5️⃣ Aggregate stats
       {
         $group: {
           _id: null,
-          matches: { $addToSet: '$match_id' },
+          matches: { $addToSet: '$_id' },
 
-          goals: {
+          fieldGoals: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'Goal'] }, 1, 0]
+              $cond: [
+                {
+                  $eq: [
+                    { $toLower: { $trim: { input: '$match_events.type' } } },
+                    'goal'
+                  ]
+                },
+                1,
+                0
+              ]
             }
           },
 
-          pc: {
+          pcEarned: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'Penalty Corner Scored'] }, 1, 0]
+              $cond: [
+                {
+                  $eq: [
+                    { $toLower: { $trim: { input: '$match_events.type' } } },
+                    'pc earned'
+                  ]
+                },
+                1,
+                0
+              ]
             }
           },
 
-          ps: {
+          pcScored: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'PC Scored'] }, 1, 0]
+            }
+          },
+
+          psEarned: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'PS Earned'] }, 1, 0]
+            }
+          },
+
+          psScored: {
             $sum: {
               $cond: [{ $eq: ['$match_events.type', 'Penalty Stroke Scored'] }, 1, 0]
+            }
+          },
+
+          penaltyShootout: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout'] }, 1, 0]
             }
           },
 
@@ -215,51 +449,378 @@ app.get('/api/player-stats/:userId', async (req, res) => {
             $sum: {
               $cond: [{ $eq: ['$match_events.type', 'Green Card'] }, 1, 0]
             }
+          }
+        }
+      },
+
+      // 6️⃣ Final shape
+      {
+        $project: {
+          _id: 0,
+          totalMatches: { $size: '$matches' },
+
+          fieldGoals: 1,
+          pcEarned: 1,
+          pcScored: 1,
+          psEarned: 1,
+          psScored: 1,
+          penaltyShootout: 1,
+
+          redCards: 1,
+          yellowCards: 1,
+          greenCards: 1,
+
+          totalGoalScore: {
+            $add: ['$fieldGoals', '$pcScored', '$psScored']
+          }
+        }
+      }
+    ]);
+
+    res.json(stats[0] || {
+      totalMatches: 0,
+      fieldGoals: 0,
+      pcEarned: 0,
+      pcScored: 0,
+      psEarned: 0,
+      psScored: 0,
+      penaltyShootout: 0,
+      redCards: 0,
+      yellowCards: 0,
+      greenCards: 0,
+      totalGoalScore: 0
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: 'Error calculating player stats',
+      error: err.message
+    });
+  }
+});
+
+
+// app.get('/api/player-stats/:userId', async (req, res) => {
+//   const playerId = req.params.userId;
+
+//   try {
+//     const result = await MatchLive.aggregate([
+
+//       // 1️⃣ Only matches where player was in squad
+//       {
+//         $match: {
+//           $or: [
+//             { 'team1_players.player_id': playerId },
+//             { 'team2_players.player_id': playerId }
+//           ]
+//         }
+//       },
+
+//       // 2️⃣ Split pipeline by match status + stats
+//       {
+//         $facet: {
+
+//           // 🔹 FINISHED MATCHES
+//           finishedMatches: [
+//             { $match: { status: 'Finished' } },
+//             {
+//               $project: {
+//                 _id: 0,
+//                 match_id: 1,
+//                 team1_name: 1,
+//                 team2_name: 1,
+//                 team1_score: 1,
+//                 team2_score: 1,
+//                 match_date: 1,
+//                 venue: 1,
+//                 status: 1,
+//                 playerTeam: {
+//                   $cond: [
+//                     { $in: [playerId, '$team1_players.player_id'] },
+//                     '$team1_name',
+//                     '$team2_name'
+//                   ]
+//                 }
+//               }
+//             }
+//           ],
+
+//           // 🔹 LIVE MATCHES
+//           liveMatches: [
+//             { $match: { status: 'Live' } },
+//             {
+//               $project: {
+//                 _id: 0,
+//                 match_id: 1,
+//                 team1_name: 1,
+//                 team2_name: 1,
+//                 team1_score: 1,
+//                 team2_score: 1,
+//                 current_quarter: 1,
+//                 venue: 1,
+//                 status: 1
+//               }
+//             }
+//           ],
+
+//           // 🔹 UPCOMING MATCHES
+//           upcomingMatches: [
+//             { $match: { status: 'Upcoming' } },
+//             {
+//               $project: {
+//                 _id: 0,
+//                 match_id: 1,
+//                 team1_name: 1,
+//                 team2_name: 1,
+//                 match_date: 1,
+//                 match_time: 1,
+//                 venue: 1,
+//                 status: 1
+//               }
+//             }
+//           ],
+
+//           // 🔹 PLAYER STATS (event-based)
+//           stats: [
+//             {
+//               $unwind: {
+//                 path: '$match_events',
+//                 preserveNullAndEmptyArrays: true
+//               }
+//             },
+//             {
+//               $match: {
+//                 'match_events.player_id': playerId
+//               }
+//             },
+//             {
+//               $group: {
+//                 _id: null,
+//                 goals: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'Goal'] }, 1, 0] }
+//                 },
+//                 pc: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'PC Scored'] }, 1, 0] }
+//                 },
+//                 ps: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'Penalty Stroke Scored'] }, 1, 0] }
+//                 },
+//                 redCards: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'Red Card'] }, 1, 0] }
+//                 },
+//                 yellowCards: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'Yellow Card'] }, 1, 0] }
+//                 },
+//                 greenCards: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'Green Card'] }, 1, 0] }
+//                 },
+//                 penaltyShootout: {
+//                   $sum: { $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout'] }, 1, 0] }
+//                 }
+//               }
+//             }
+//           ]
+//         }
+//       },
+
+//       // 3️⃣ Final shaping
+//       {
+//         $project: {
+//           finishedMatches: 1,
+//           liveMatches: 1,
+//           upcomingMatches: 1,
+
+//           stats: {
+//             $ifNull: [
+//               { $arrayElemAt: ['$stats', 0] },
+//               {
+//                 goals: 0,
+//                 pc: 0,
+//                 ps: 0,
+//                 redCards: 0,
+//                 yellowCards: 0,
+//                 greenCards: 0,
+//                 penaltyShootout: 0
+//               }
+//             ]
+//           }
+//         }
+//       },
+
+//       // 4️⃣ Add totals
+//       {
+//         $addFields: {
+//           totalMatches: {
+//             $add: [
+//               { $size: '$finishedMatches' },
+//               { $size: '$liveMatches' }
+//             ]
+//           },
+//           totalGoalScore: {
+//             $add: [
+//               '$stats.goals',
+//               '$stats.pc',
+//               '$stats.ps'
+//             ]
+//           }
+//         }
+//       }
+//     ]);
+
+//     res.json(result[0] || {
+//       finishedMatches: [],
+//       liveMatches: [],
+//       upcomingMatches: [],
+//       totalMatches: 0,
+//       totalGoalScore: 0,
+//       stats: {}
+//     });
+
+//   } catch (err) {
+//     res.status(500).json({
+//       message: 'Error fetching player stats',
+//       error: err.message
+//     });
+//   }
+// });
+
+app.get('/api/tournament/:tournamentId/stats', async (req, res) => {
+  const { tournamentId } = req.params;
+
+  try {
+    const stats = await MatchLive.aggregate([
+      // 1️⃣ Tournament + valid match statuses
+      {
+        $match: {
+          tournament_id: tournamentId,
+          status: { $in: ['Live', 'Finished'] }
+        }
+      },
+
+      // 2️⃣ Lock match universe
+      {
+        $group: {
+          _id: '$match_id',
+          match_events: { $first: '$match_events' }
+        }
+      },
+
+      // 3️⃣ Unwind events (keep matches even if no events)
+      {
+        $unwind: {
+          path: '$match_events',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // 4️⃣ Aggregate tournament-level stats
+      {
+        $group: {
+          _id: null,
+          matches: { $addToSet: '$_id' },
+
+          fieldGoals: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Goal'] }, 1, 0]
+            }
+          },
+
+          pcEarned: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'PC Earned'] }, 1, 0]
+            }
+          },
+
+          pcScored: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'PC Scored'] }, 1, 0]
+            }
+          },
+
+          psEarned: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'PS Earned'] }, 1, 0]
+            }
+          },
+
+          psScored: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Stroke Scored'] }, 1, 0]
+            }
           },
 
           penaltyShootout: {
             $sum: {
               $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout'] }, 1, 0]
             }
+          },
+
+          redCards: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Red Card'] }, 1, 0]
+            }
+          },
+
+          yellowCards: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Yellow Card'] }, 1, 0]
+            }
+          },
+
+          greenCards: {
+            $sum: {
+              $cond: [{ $eq: ['$match_events.type', 'Green Card'] }, 1, 0]
+            }
           }
         }
       },
 
+      // 5️⃣ Final shape
       {
         $project: {
           _id: 0,
           totalMatches: { $size: '$matches' },
-          goals: 1,
-          pc: 1,
-          ps: 1,
+
+          fieldGoals: 1,
+          pcEarned: 1,
+          pcScored: 1,
+          psEarned: 1,
+          psScored: 1,
+          penaltyShootout: 1,
+
           redCards: 1,
           yellowCards: 1,
           greenCards: 1,
-          penaltyShootout: 1,
+
           totalGoalScore: {
-            $add: ['$goals', '$pc', '$ps', '$penaltyShootout']
+            $add: ['$fieldGoals', '$pcScored', '$psScored']
           }
         }
       }
     ]);
 
-    console.log('Player stats aggregation complete', stats),
-
     res.json(stats[0] || {
       totalMatches: 0,
-      goals: 0,
-      pc: 0,
-      ps: 0,
+      fieldGoals: 0,
+      pcEarned: 0,
+      pcScored: 0,
+      psEarned: 0,
+      psScored: 0,
+      penaltyShootout: 0,
       redCards: 0,
       yellowCards: 0,
       greenCards: 0,
-      penaltyShootout: 0,
       totalGoalScore: 0
     });
+
   } catch (err) {
-    res.status(500).json({ message: 'Error calculating stats', error: err.message });
+    res.status(500).json({
+      message: 'Error calculating tournament stats',
+      error: err.message
+    });
   }
 });
+
 
 app.get('/api/tournamentId/:tournamentId/matches', async (req, res) => {
   try {
