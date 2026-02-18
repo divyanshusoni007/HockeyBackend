@@ -821,6 +821,155 @@ app.get('/api/tournament/:tournamentId/stats', async (req, res) => {
   }
 });
 
+app.get('/api/tournament/:tournamentId/points-table', async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+
+    const tournament = await AddTournament.findOne({ tournament_id: tournamentId });
+    if (!tournament) {
+      return res.status(404).json({ error: 'Tournament not found.' });
+    }
+
+    const teams = await Teams.find({ tournament_id: tournament._id }).select('team_id team_name pool');
+    const poolMap = new Map();
+
+    for (const team of teams) {
+      const poolName = team?.pool?.name || 'Unassigned';
+      if (!poolMap.has(poolName)) {
+        poolMap.set(poolName, {
+          pool_name: poolName,
+          teams: []
+        });
+      }
+      poolMap.get(poolName).teams.push({
+        team_id: team.team_id,
+        team_name: team.team_name,
+        played: 0,
+        won: 0,
+        draw: 0,
+        lost: 0,
+        scored_for: 0,
+        scored_against: 0,
+        goal_diff: 0,
+        points: 0,
+        results: []
+      });
+    }
+
+    const teamToPool = new Map();
+    for (const [poolName, poolData] of poolMap.entries()) {
+      for (const t of poolData.teams) {
+        teamToPool.set((t.team_name || '').trim().toLowerCase(), poolName);
+      }
+    }
+
+    const matches = await MatchLive.find({ tournament_id: tournamentId }).select(
+      'team1_name team2_name team1_score team2_score status match_date match_time'
+    );
+
+    const completedMatches = matches
+      .filter((m) => {
+        const status = String(m.status || '').toLowerCase();
+        if (status.includes('live') || status.includes('upcoming') || status.includes('pending') || status.includes('scheduled')) {
+          return false;
+        }
+        return Number.isFinite(Number(m.team1_score)) && Number.isFinite(Number(m.team2_score));
+      })
+      .sort((a, b) => {
+        const da = Date.parse(`${a.match_date || ''}T${a.match_time || '00:00'}`) || 0;
+        const db = Date.parse(`${b.match_date || ''}T${b.match_time || '00:00'}`) || 0;
+        return da - db;
+      });
+
+    const getTeamRow = (poolName, teamName) => {
+      const pool = poolMap.get(poolName);
+      if (!pool) return null;
+      const key = (teamName || '').trim().toLowerCase();
+      return pool.teams.find((t) => (t.team_name || '').trim().toLowerCase() === key) || null;
+    };
+
+    for (const match of completedMatches) {
+      const homeName = String(match.team1_name || '').trim();
+      const awayName = String(match.team2_name || '').trim();
+      const homeKey = homeName.toLowerCase();
+      const awayKey = awayName.toLowerCase();
+      const homePool = teamToPool.get(homeKey);
+      const awayPool = teamToPool.get(awayKey);
+
+      if (!homePool || !awayPool || homePool !== awayPool) continue;
+
+      const home = getTeamRow(homePool, homeName);
+      const away = getTeamRow(awayPool, awayName);
+      if (!home || !away) continue;
+
+      const homeScore = Number(match.team1_score) || 0;
+      const awayScore = Number(match.team2_score) || 0;
+
+      home.played += 1;
+      away.played += 1;
+      home.scored_for += homeScore;
+      home.scored_against += awayScore;
+      away.scored_for += awayScore;
+      away.scored_against += homeScore;
+
+      if (homeScore > awayScore) {
+        home.won += 1;
+        home.points += 3;
+        away.lost += 1;
+        home.results.push('W');
+        away.results.push('L');
+      } else if (awayScore > homeScore) {
+        away.won += 1;
+        away.points += 3;
+        home.lost += 1;
+        home.results.push('L');
+        away.results.push('W');
+      } else {
+        home.draw += 1;
+        away.draw += 1;
+        home.points += 1;
+        away.points += 1;
+        home.results.push('D');
+        away.results.push('D');
+      }
+
+      home.goal_diff = home.scored_for - home.scored_against;
+      away.goal_diff = away.scored_for - away.scored_against;
+    }
+
+    const pools = Array.from(poolMap.values()).map((pool) => {
+      const sortedTeams = pool.teams.sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        if (b.goal_diff !== a.goal_diff) return b.goal_diff - a.goal_diff;
+        if (b.scored_for !== a.scored_for) return b.scored_for - a.scored_for;
+        if (b.won !== a.won) return b.won - a.won;
+        return String(a.team_name).localeCompare(String(b.team_name));
+      });
+
+      const ranked = sortedTeams.map((t, index) => ({
+        ...t,
+        position: index + 1,
+        results: t.results.slice(-5)
+      }));
+
+      return {
+        pool_name: pool.pool_name,
+        teams: ranked
+      };
+    });
+
+    res.status(200).json({
+      tournament_id: tournamentId,
+      tournament_name: tournament.tournament_name,
+      generated_at: new Date().toISOString(),
+      pools
+    });
+  } catch (error) {
+    console.error('Error generating points table:', error);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 
 app.get('/api/tournamentId/:tournamentId/matches', async (req, res) => {
   try {
