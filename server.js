@@ -2429,6 +2429,36 @@ io.on("connection", (socket) => {
   });
 });
 
+// PUT - Update match date & time to current system date/time
+app.put('/api/matches/:matchId/update-time', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+
+    const now = new Date();
+    const formattedDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const formattedTime = now.toTimeString().slice(0, 5);  // HH:MM
+
+    const updatedMatch = await MatchLive.findOneAndUpdate(
+      { match_id: matchId },
+      {
+        match_date: formattedDate,
+        match_time: formattedTime,
+        updated_at: Date.now()
+      },
+      { new: true }
+    );
+
+    if (!updatedMatch) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    res.json(updatedMatch);
+  } catch (err) {
+    console.error('Error updating match time:', err);
+    res.status(500).json({ error: 'Failed to update match time' });
+  }
+});
+
 
 app.get("/api/users/phone/:phone_number", async (req, res) => {
   try {
