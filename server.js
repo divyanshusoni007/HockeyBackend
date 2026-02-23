@@ -166,29 +166,33 @@ app.post('/auth/phone-email', (req, res) => {
         // 🔍 Check if user already exists
         let user = await User.findOne({ phone_number: phone });
         let isNewUser = false;
-
+        console.log('Existing user found:', user);
         const firstName = jsonData.user_first_name || '';
         const lastName = jsonData.user_last_name || '';
         const fullName = `${firstName} ${lastName}`.trim();
         const hasName = fullName.length > 0;
 
         if (!user) {
-          // 🆕 New user: create a minimal record with just phone number
+          // 🆕 Brand new user → always go to profile form
           isNewUser = true;
 
-          // Generate a basic user_id (will be updated properly when they fill profile)
-          const randomId = crypto.randomBytes(4).toString('hex'); // e.g. "a3f2bc91"
+          const randomId = crypto.randomBytes(4).toString('hex');
           const user_id = `ph${randomId}`;
 
           user = await User.create({
             user_id,
-            full_name: hasName ? fullName : 'New User',
+            full_name: 'New User',
             phone_number: phone
           });
-        } else if (!hasName) {
-          // ✅ User exists in DB but Phone.Email returned no name
-          // Still redirect to profile form so they can complete/verify details
-          isNewUser = true;
+
+        } else {
+          // ✅ Existing user → check if profile is complete
+          // If full_name is still 'New User' or empty, send to profile form
+          const isProfileIncomplete = !user.full_name || 
+                                      user.full_name === 'New User' || 
+                                      user.full_name.trim() === '';
+
+          isNewUser = isProfileIncomplete;
         }
 
         // 🔐 Sign JWT
@@ -3078,6 +3082,7 @@ const nodemailer = require("nodemailer");
 const AddTournament = require("./models/AddTournament");
 const Teams = require("./models/Teams");
 const TeamMembers = require("./models/TeamMembers");
+const { log } = require("console");
 
 app.post("/api/send-email", async (req, res) => {
   try {
