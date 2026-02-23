@@ -2113,6 +2113,133 @@ app.post("/api/teams/:team_id/members", async (req, res) => {
   }
 });
 
+// Helper: block member removal once team has started any match
+async function hasTeamStartedAnyMatch(team) {
+  const teamId = team?.team_id;
+  const teamName = team?.team_name;
+
+  const startedStatusRegex = /(live|finish|complete|progress)/i;
+
+  const liveMatchFilter = {
+    $and: [
+      {
+        $or: [
+          { team1_id: teamId },
+          { team2_id: teamId },
+          { team1_name: teamName },
+          { team2_name: teamName }
+        ]
+      },
+      {
+        $or: [
+          { status: startedStatusRegex },
+          { team1_score: { $gt: 0 } },
+          { team2_score: { $gt: 0 } }
+        ]
+      }
+    ]
+  };
+
+  const legacyMatchFilter = {
+    $and: [
+      {
+        $or: [
+          { home_team_id: teamId },
+          { away_team_id: teamId },
+          { home_team_name: teamName },
+          { away_team_name: teamName }
+        ]
+      },
+      {
+        $or: [
+          { status: startedStatusRegex },
+          { home_score: { $gt: 0 } },
+          { away_score: { $gt: 0 } }
+        ]
+      }
+    ]
+  };
+
+  const [liveMatch, legacyMatch] = await Promise.all([
+    MatchLive.findOne(liveMatchFilter).select("_id").lean(),
+    Match.findOne(legacyMatchFilter).select("_id").lean()
+  ]);
+
+  return !!(liveMatch || legacyMatch);
+}
+
+function buildMemberLookupConditions(memberKey) {
+  const conditions = [{ user_id: memberKey }];
+  if (mongoose.Types.ObjectId.isValid(memberKey)) {
+    conditions.push({ _id: new mongoose.Types.ObjectId(memberKey) });
+  }
+  return conditions;
+}
+
+async function removeTeamMember(req, res) {
+  try {
+    const { team_id } = req.params;
+    const memberKey =
+      req.params.member_id ||
+      req.body?.member_id ||
+      req.body?.memberId ||
+      req.body?.user_id ||
+      req.body?.userId ||
+      req.query?.member_id ||
+      req.query?.memberId ||
+      req.query?.user_id ||
+      req.query?.userId;
+
+    if (!team_id) {
+      return res.status(400).json({ error: "Team ID is required." });
+    }
+
+    if (!memberKey) {
+      return res.status(400).json({ error: "Member ID or user ID is required." });
+    }
+
+    const team = await Teams.findOne({ team_id });
+    if (!team) {
+      return res.status(404).json({ error: `Team with ID "${team_id}" not found.` });
+    }
+
+    const started = await hasTeamStartedAnyMatch(team);
+    if (started) {
+      return res.status(409).json({
+        error: "Player removal is locked because this team has started a match."
+      });
+    }
+
+    const member = await TeamMembers.findOne({
+      team_id,
+      $or: buildMemberLookupConditions(String(memberKey))
+    });
+
+    if (!member) {
+      return res.status(404).json({ error: "Member not found in this team." });
+    }
+
+    await TeamMembers.deleteOne({ _id: member._id });
+
+    return res.status(200).json({
+      message: "Team member removed successfully.",
+      removed_member_id: member._id,
+      removed_user_id: member.user_id
+    });
+  } catch (error) {
+    console.error("Error removing team member:", error);
+    return res.status(500).json({ error: "Server error: Could not remove team member." });
+  }
+}
+
+// DELETE member by route param (canonical)
+app.delete("/api/team/:team_id/members/:member_id", removeTeamMember);
+app.delete("/api/teams/:team_id/members/:member_id", removeTeamMember);
+
+// DELETE member by body/query fallback (frontend compatibility)
+app.delete("/api/team/:team_id/members", removeTeamMember);
+app.delete("/api/teams/:team_id/members", removeTeamMember);
+
 app.get("/api/tournaments/:tournament_id", async (req, res) => {
   try {
     const { tournament_id } = req.params; // Extract match_id from URL parameters
