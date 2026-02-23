@@ -46,6 +46,86 @@ app.get("/", (req, res) => {
 
 
 // 🔹 Phone.Email OTP verification route
+// app.post('/auth/phone-email', (req, res) => {
+//   const { user_json_url } = req.body;
+
+//   if (!user_json_url) {
+//     return res.status(400).json({ error: 'user_json_url missing' });
+//   }
+
+//   https.get(user_json_url, (response) => {
+//     let data = '';
+
+//     // 🔴 IMPORTANT: check status code
+//     if (response.statusCode !== 200) {
+//       return res.status(500).json({
+//         error: 'Failed to fetch Phone.Email verification data'
+//       });
+//     }
+
+//     response.on('data', chunk => {
+//       data += chunk;
+//     });
+
+//     response.on('end', async () => {
+//       try {
+//         // 🔍 DEBUG (temporarily)
+//         console.log('Phone.Email raw response:', data);
+
+//         const jsonData = JSON.parse(data);
+
+//         const phone = jsonData.user_phone_number;
+//         if (!phone) {
+//           return res.status(400).json({
+//             error: 'Phone number not found in Phone.Email response'
+//           });
+//         }
+
+//         const firstName = jsonData.user_first_name || '';
+//         const lastName = jsonData.user_last_name || '';
+//         const fullName = `${firstName} ${lastName}`.trim() || 'New User';
+
+//         let user = await User.findOne({ phone_number: phone });
+
+//         if (!user) {
+//           user = await User.create({
+//             user_id: crypto.randomUUID
+//               ? crypto.randomUUID()
+//               : crypto.randomBytes(16).toString('hex'),
+//             full_name: fullName,
+//             phone_number: phone
+//           });
+//         }
+
+//         // 🔐 Make sure JWT secret exists
+//         if (!process.env.JWT_SECRET_KEY) {
+//           throw new Error('JWT_SECRET_KEY not defined');
+//         }
+
+//         const token = jwt.sign(
+//           { userId: user._id, phone: user.phone_number },
+//           process.env.JWT_SECRET_KEY,
+//           { expiresIn: '7d' }
+//         );
+
+//         res.json({ token });
+
+//       } catch (err) {
+//         console.error('Phone.Email verification error:', err);
+//         res.status(500).json({
+//           error: 'Phone verification failed',
+//           details: err.message
+//         });
+//       }
+//     });
+
+//   }).on('error', (err) => {
+//     console.error('HTTPS error:', err);
+//     res.status(500).json({ error: err.message });
+//   });
+// });
+
+
 app.post('/auth/phone-email', (req, res) => {
   const { user_json_url } = req.body;
 
@@ -56,7 +136,6 @@ app.post('/auth/phone-email', (req, res) => {
   https.get(user_json_url, (response) => {
     let data = '';
 
-    // 🔴 IMPORTANT: check status code
     if (response.statusCode !== 200) {
       return res.status(500).json({
         error: 'Failed to fetch Phone.Email verification data'
@@ -69,7 +148,6 @@ app.post('/auth/phone-email', (req, res) => {
 
     response.on('end', async () => {
       try {
-        // 🔍 DEBUG (temporarily)
         console.log('Phone.Email raw response:', data);
 
         const jsonData = JSON.parse(data);
@@ -81,34 +159,59 @@ app.post('/auth/phone-email', (req, res) => {
           });
         }
 
-        const firstName = jsonData.user_first_name || '';
-        const lastName = jsonData.user_last_name || '';
-        const fullName = `${firstName} ${lastName}`.trim() || 'New User';
-
-        let user = await User.findOne({ phone_number: phone });
-
-        if (!user) {
-          user = await User.create({
-            user_id: crypto.randomUUID
-              ? crypto.randomUUID()
-              : crypto.randomBytes(16).toString('hex'),
-            full_name: fullName,
-            phone_number: phone
-          });
-        }
-
-        // 🔐 Make sure JWT secret exists
         if (!process.env.JWT_SECRET_KEY) {
           throw new Error('JWT_SECRET_KEY not defined');
         }
 
+        // 🔍 Check if user already exists
+        let user = await User.findOne({ phone_number: phone });
+        let isNewUser = false;
+
+        const firstName = jsonData.user_first_name || '';
+        const lastName = jsonData.user_last_name || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        const hasName = fullName.length > 0;
+
+        if (!user) {
+          // 🆕 New user: create a minimal record with just phone number
+          isNewUser = true;
+
+          // Generate a basic user_id (will be updated properly when they fill profile)
+          const randomId = crypto.randomBytes(4).toString('hex'); // e.g. "a3f2bc91"
+          const user_id = `ph${randomId}`;
+
+          user = await User.create({
+            user_id,
+            full_name: hasName ? fullName : 'New User',
+            phone_number: phone
+          });
+        } else if (!hasName) {
+          // ✅ User exists in DB but Phone.Email returned no name
+          // Still redirect to profile form so they can complete/verify details
+          isNewUser = true;
+        }
+
+        // 🔐 Sign JWT
         const token = jwt.sign(
-          { userId: user._id, phone: user.phone_number },
+          { userId: user._id, phone: user.phone_number, user_id: user.user_id },
           process.env.JWT_SECRET_KEY,
           { expiresIn: '7d' }
         );
 
-        res.json({ token });
+        console.log('Sending response:', {
+          token,
+          isNewUser,
+          user_id: user.user_id,
+          phone_number: user.phone_number
+        });
+
+        // ✅ Return token + flag + user_id
+        res.json({
+          token,
+          isNewUser,
+          user_id: user.user_id,
+          phone_number: user.phone_number
+        });
 
       } catch (err) {
         console.error('Phone.Email verification error:', err);
@@ -124,7 +227,6 @@ app.post('/auth/phone-email', (req, res) => {
     res.status(500).json({ error: err.message });
   });
 });
-
 
 // GET all matches for the dashboard
 app.get('/api/matches', async (req, res) => {
@@ -400,7 +502,7 @@ app.get('/api/player-stats/:userId', async (req, res) => {
                 {
                   $eq: [
                     { $toLower: { $trim: { input: '$match_events.type' } } },
-                    'pc earned'
+                    'penalty corner earned'
                   ]
                 },
                 1,
@@ -411,13 +513,13 @@ app.get('/api/player-stats/:userId', async (req, res) => {
 
           pcScored: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'PC Scored'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Corner Scored'] }, 1, 0]
             }
           },
 
           psEarned: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'PS Earned'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Stroke Earned'] }, 1, 0]
             }
           },
 
@@ -429,7 +531,7 @@ app.get('/api/player-stats/:userId', async (req, res) => {
 
           penaltyShootout: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout Goal'] }, 1, 0]
             }
           },
 
@@ -684,6 +786,50 @@ app.get('/api/player-stats/:userId', async (req, res) => {
 //   }
 // });
 
+app.get('/api/tournament/:tournamentId/teams', async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+
+    const tournament = await AddTournament.findOne({ tournament_id: tournamentId });
+    if (!tournament) {
+      return res.status(404).json({ error: 'Tournament not found.' });
+    }
+
+    const teams = await Teams.find({ tournament_id: tournament._id })
+      .select('team_id team_name location logo_url pool');
+
+    res.json(teams);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/tournament/:tournamentId/matches1', async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+
+    const matches = await MatchLive.find({ tournament_id: tournamentId })
+      .sort({ match_date: -1 });
+
+    const formattedMatches = matches.map(match => ({
+      match_id: match.match_id,
+      match_date: match.match_date,
+      match_time: match.match_time,
+      venue: match.venue,
+      status: match.status,
+      team1_name: match.team1_name,
+      team2_name: match.team2_name,
+      team1_score: match.team1_score,
+      team2_score: match.team2_score,
+      current_quarter: match.current_quarter
+    }));
+
+    res.json(formattedMatches);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/tournament/:tournamentId/stats', async (req, res) => {
   const { tournamentId } = req.params;
 
@@ -727,19 +873,19 @@ app.get('/api/tournament/:tournamentId/stats', async (req, res) => {
 
           pcEarned: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'PC Earned'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Corner Earned'] }, 1, 0]
             }
           },
 
           pcScored: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'PC Scored'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Corner Scored'] }, 1, 0]
             }
           },
 
           psEarned: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'PS Earned'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Stroke Earned'] }, 1, 0]
             }
           },
 
@@ -751,7 +897,7 @@ app.get('/api/tournament/:tournamentId/stats', async (req, res) => {
 
           penaltyShootout: {
             $sum: {
-              $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout'] }, 1, 0]
+              $cond: [{ $eq: ['$match_events.type', 'Penalty Shootout Goal'] }, 1, 0]
             }
           },
 
@@ -1125,6 +1271,52 @@ app.post("/api/users", async (req, res) => {
   }
 });
 
+//PUT METHOD FOR NEW USER
+app.put('/api/users/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const allowedFields = [
+      'full_name', 'email', 'date_of_birth', 'gender',
+      'address', 'zip', 'position', 'jersey_number',
+      'player_bio', 'profile_pic'
+    ];
+
+    const updateData = {};
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: 'No valid fields provided to update.' });
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { user_id },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Error updating user:', error);
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'Email already in use.' });
+    }
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // POST METHOD FOR ADD MATCH
 app.post("/api/match", async (req, res) => {
   try {
@@ -1142,7 +1334,7 @@ app.post("/api/match", async (req, res) => {
       scorer_name,
       // home_score, away_score, winner_team_id are excluded as they'll be updated later
     } = req.body;
-console.log("Received request to add match:", req.body);
+    console.log("Received request to add match:", req.body);
     // --- Fetch tournament_id from tournament_name ---
     if (!tournament_name) {
       return res.status(400).json({ error: "Tournament name is required." });
