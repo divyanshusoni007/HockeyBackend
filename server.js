@@ -232,6 +232,36 @@ app.post('/auth/phone-email', (req, res) => {
   });
 });
 
+
+// GET /api/tournaments/search - Search tournaments by name
+app.get("/api/tournaments/search", async (req, res) => {
+  try {
+    const { name } = req.query;
+
+    // Validate search query
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({
+        error: "Tournament name search query is required"
+      });
+    }
+
+    const searchQuery = name.trim();
+    
+    // Case-insensitive search using regex
+    const tournaments = await AddTournament.find({
+      tournament_name: { $regex: searchQuery, $options: "i" }
+    });
+
+    console.log(`✅ Search for "${searchQuery}" found ${tournaments.length} tournaments`);
+
+    res.status(200).json(tournaments);
+  } catch (error) {
+    console.error("❌ Error searching tournaments:", error);
+    res.status(500).json({ error: "Server error while searching tournaments" });
+  }
+});
+
+
 // GET all matches for the dashboard
 app.get('/api/matches', async (req, res) => {
   try {
