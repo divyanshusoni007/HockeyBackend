@@ -160,8 +160,8 @@ app.post('/auth/phone-email', (req, res) => {
           });
         }
 
-        if (!process.env.JWT_SECRET) {
-          throw new Error('JWT_SECRET not defined');
+        if (!process.env.JWT_SECRET_KEY) {
+          throw new Error('JWT_SECRET_KEY not defined');
         }
 
         // 🔍 Check if user already exists
@@ -3162,7 +3162,7 @@ app.post("/api/send-email", async (req, res) => {
 
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 console.log(`✅ MONGODB_URI=${process.env.MONGODB_URI}`);
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
