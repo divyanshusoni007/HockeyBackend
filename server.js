@@ -8,6 +8,7 @@ const https = require('https');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
+
 const Match = require("./models/Match");
 const MatchLive = require('./models/MatchLive');
 const User = require('./models/User');
@@ -98,13 +99,13 @@ app.get("/", (req, res) => {
 //         }
 
 //         // 🔐 Make sure JWT secret exists
-//         if (!process.env.JWT_SECRET_KEY) {
-//           throw new Error('JWT_SECRET_KEY not defined');
+//         if (!process.env.JWT_SECRET) {
+//           throw new Error('JWT_SECRET not defined');
 //         }
 
 //         const token = jwt.sign(
 //           { userId: user._id, phone: user.phone_number },
-//           process.env.JWT_SECRET_KEY,
+//           process.env.JWT_SECRET,
 //           { expiresIn: '7d' }
 //         );
 
@@ -159,8 +160,8 @@ app.post('/auth/phone-email', (req, res) => {
           });
         }
 
-        if (!process.env.JWT_SECRET_KEY) {
-          throw new Error('JWT_SECRET_KEY not defined');
+        if (!process.env.JWT_SECRET) {
+          throw new Error('JWT_SECRET not defined');
         }
 
         // 🔍 Check if user already exists
@@ -198,7 +199,7 @@ app.post('/auth/phone-email', (req, res) => {
         // 🔐 Sign JWT
         const token = jwt.sign(
           { userId: user._id, phone: user.phone_number, user_id: user.user_id },
-          process.env.JWT_SECRET_KEY,
+          process.env.JWT_SECRET,
           { expiresIn: '7d' }
         );
 
@@ -3161,8 +3162,7 @@ app.post("/api/send-email", async (req, res) => {
 
 
 
-
-const PORT = 3000;
+const PORT = process.env.PORT || 5000;
 console.log(`✅ MONGODB_URI=${process.env.MONGODB_URI}`);
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
