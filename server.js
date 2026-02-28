@@ -113,13 +113,13 @@ app.get("/", (req, res) => {
 //         }
 
 //         // 🔐 Make sure JWT secret exists
-//         if (!process.env.JWT_SECRET) {
-//           throw new Error('JWT_SECRET not defined');
+//         if (!process.env.JWT_SECRET_KEY) {
+//           throw new Error('JWT_SECRET_KEY not defined');
 //         }
 
 //         const token = jwt.sign(
 //           { userId: user._id, phone: user.phone_number },
-//           process.env.JWT_SECRET,
+//           process.env.JWT_SECRET_KEY,
 //           { expiresIn: '7d' }
 //         );
 
@@ -214,7 +214,11 @@ app.post('/auth/phone-email', (req, res) => {
         // 🔐 Sign JWT
         const token = jwt.sign(
           { userId: user._id, phone: user.phone_number, user_id: user.user_id },
+<<<<<<< HEAD
           jwtSecret,
+=======
+          process.env.JWT_SECRET_KEY,
+>>>>>>> 8a02af23d752e98e36de6d4d97526ec7fb110666
           { expiresIn: '7d' }
         );
 
