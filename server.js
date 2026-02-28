@@ -46,7 +46,7 @@ const io = new Server(server, {
 });
 
 app.use(cors(corsOptions));
-app.options("*", cors());
+app.options("/*", cors());
 app.use(express.json());
 
 
