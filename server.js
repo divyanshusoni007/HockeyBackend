@@ -17,12 +17,18 @@ const app = express();
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
-const configuredOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
-  .split(',')
-  .map((value) => value.trim())
-  .filter(Boolean);
-const defaultOrigins = ['http://localhost:4200', 'http://127.0.0.1:4200'];
-const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])];
+// const configuredOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+//   .split(',')
+//   .map((value) => value.trim())
+//   .filter(Boolean);
+// const defaultOrigins = ['http://localhost:4200', 'http://127.0.0.1:4200'];
+// const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])];
+
+const allowedOrigins = [
+  "https://stickstatsfrontend.onrender.com",
+  "https://stickstats.in",
+  "https://www.stickstats.in"
+];
 
 const corsOptions = {
   origin(origin, callback) {
@@ -40,6 +46,7 @@ const io = new Server(server, {
 });
 
 app.use(cors(corsOptions));
+app.options("*", cors());
 app.use(express.json());
 
 
