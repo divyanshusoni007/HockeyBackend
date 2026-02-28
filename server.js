@@ -17,15 +17,29 @@ const app = express();
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
+const configuredOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+const defaultOrigins = ['http://localhost:4200', 'http://127.0.0.1:4200'];
+const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])];
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true
+};
+
 // Create socket.io instance
 const io = new Server(server, {
-  cors: {
-    origin: "*", // Change to your frontend URL in production
-    methods: ["GET", "POST"]
-  }
+  cors: corsOptions
 });
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 
@@ -160,8 +174,9 @@ app.post('/auth/phone-email', (req, res) => {
           });
         }
 
-        if (!process.env.JWT_SECRET_KEY) {
-          throw new Error('JWT_SECRET_KEY not defined');
+        const jwtSecret = process.env.JWT_SECRET || process.env.JWT_SECRET_KEY;
+        if (!jwtSecret) {
+          throw new Error('JWT secret not defined');
         }
 
         // 🔍 Check if user already exists
@@ -199,7 +214,7 @@ app.post('/auth/phone-email', (req, res) => {
         // 🔐 Sign JWT
         const token = jwt.sign(
           { userId: user._id, phone: user.phone_number, user_id: user.user_id },
-          process.env.JWT_SECRET,
+          jwtSecret,
           { expiresIn: '7d' }
         );
 
