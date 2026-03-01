@@ -220,7 +220,7 @@ app.post('/auth/phone-email', (req, res) => {
         // 🔐 Sign JWT
         const token = jwt.sign(
           { userId: user._id, phone: user.phone_number, user_id: user.user_id },
-          process.env.JWT_SECRET_KEY,
+          jwtSecret,
           { expiresIn: '7d' }
         );
 
