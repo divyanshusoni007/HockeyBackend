@@ -382,15 +382,22 @@ app.get('/api/player/:userId/teams', async (req, res) => {
         $addFields: {
           result: {
             $cond: [
-              { $gt: ['$teamScore', '$opponentScore'] },
-              'WIN',
+              // Check if the match is actually finished
+              { $eq: ["$status", "Finished"] }, 
               {
                 $cond: [
-                  { $lt: ['$teamScore', '$opponentScore'] },
-                  'LOSS',
-                  'DRAW'
+                  { $gt: ['$teamScore', '$opponentScore'] },
+                  'WIN',
+                  {
+                    $cond: [
+                      { $lt: ['$teamScore', '$opponentScore'] },
+                      'LOSS',
+                      'DRAW'
+                    ]
+                  }
                 ]
-              }
+              },
+              "UPCOMING" // Label for matches that aren't done
             ]
           }
         }
